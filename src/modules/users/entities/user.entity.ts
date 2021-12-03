@@ -37,7 +37,7 @@ export class User extends Document {
   @Prop()
   avatarUrl: string;
 
-  @Prop({ required: true, default: UserStatus.activate })
+  @Prop({ required: true, default: UserStatus.active })
   available: UserStatus;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
