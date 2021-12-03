@@ -21,11 +21,11 @@ import { MongooseModule } from '@nestjs/mongoose';
     // UsersModule,
     // OrdersModule,
     // ProductsModule,
-    // CategoriesModule,
+    CategoriesModule,
     // AuthModule,
-    // MongooseModule.forRoot('mongodb://localhost:27017/the-coffee-app-be'),
+    MongooseModule.forRoot('mongodb://localhost:27017/the-coffee-app-be'),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
