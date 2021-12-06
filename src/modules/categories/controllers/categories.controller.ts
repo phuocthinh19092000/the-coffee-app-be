@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
@@ -15,7 +23,6 @@ import {
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
-
   @Get()
   @ApiOkResponse({
     description: 'Get All Categories successfully.',
