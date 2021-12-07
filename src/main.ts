@@ -3,7 +3,6 @@ import { AppModule } from './app/app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
     .setTitle('The Coffee App OTSV')
