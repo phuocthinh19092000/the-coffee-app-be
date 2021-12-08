@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
@@ -25,5 +25,10 @@ export class ProductsController {
   })
   create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productsService.create(createProductDto);
+  }
+
+  @Get('/search')
+  search(@Query('keyword') keyword: string): Promise<Product[]> {
+    return this.productsService.searchByName(keyword);
   }
 }
