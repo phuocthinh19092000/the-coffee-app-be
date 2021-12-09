@@ -10,4 +10,4 @@ export class Role extends Document {
   name: RoleType;
 }
 
-export const CoffeeSchema = SchemaFactory.createForClass(Role);
+export const RoleSchema = SchemaFactory.createForClass(Role);
