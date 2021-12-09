@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
@@ -14,7 +6,6 @@ import { UpdateCategoryDto } from '../dto/request/update-category.dto';
 import { Product } from '../../products/entities/product.entity';
 import {
   ApiCreatedResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
   ApiTags,
@@ -28,41 +19,38 @@ export class CategoriesController {
     description: 'Get All Categories successfully.',
     type: Category,
   })
-  @ApiNotFoundResponse({ description: 'No Category Found' })
   findAll(): Promise<Category[]> {
     return this.categoriesService.findAll();
   }
 
-  @Get(':id')
+  @Get(':name')
   @ApiOkResponse({
-    description: 'Get category by categoryId successfully',
+    description: 'Get category by category Name successfully',
     type: Category,
   })
-  @ApiNotFoundResponse({ description: 'No Category Found' })
   @ApiParam({
-    name: 'id',
+    name: 'name',
     required: true,
-    description: 'id of category',
+    description: 'name of category',
     type: String,
   })
-  findOne(@Param('id') id: string): Promise<Category> {
-    return this.categoriesService.findOne(id);
+  findOne(@Param('name') name: string): Promise<Category> {
+    return this.categoriesService.findOne(name);
   }
 
-  @Get(':id/products')
+  @Get(':name/products')
   @ApiOkResponse({
-    description: 'Get list products by categoryId successfully.',
+    description: 'Get list products by category Name successfully.',
     type: Product,
   })
-  @ApiNotFoundResponse({ description: 'No Category Found' })
   @ApiParam({
-    name: 'id',
+    name: 'name',
     required: true,
-    description: 'id of category',
+    description: 'name of category',
     type: String,
   })
-  getProductsByCategoryId(@Param('id') id: string): Promise<Product[]> {
-    return this.categoriesService.getProductsByCategoryId(id);
+  getProductsByCategoryName(@Param('name') name: string): Promise<Product[]> {
+    return this.categoriesService.getProductsByCategoryName(name);
   }
 
   @Post()
@@ -74,21 +62,21 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto);
   }
 
-  @Patch(':id')
+  @Patch(':name')
   @ApiOkResponse({
     description: 'Update Category successfully.',
     type: Category,
   })
   @ApiParam({
-    name: 'id',
+    name: 'name',
     required: true,
-    description: 'id of category',
+    description: 'name of category',
     type: String,
   })
   update(
-    @Param('id') id: string,
+    @Param('name') name: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    return this.categoriesService.update(id, updateCategoryDto);
+    return this.categoriesService.update(name, updateCategoryDto);
   }
 }

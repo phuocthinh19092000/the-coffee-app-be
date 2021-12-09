@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from '../../products/entities/product.entity';
 import { Model } from 'mongoose';
@@ -14,50 +14,41 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    const existingCategory = await this.categoriesService.findOne(
-      createProductDto.categoryId,
+    createProductDto.categoryName.toLowerCase();
+    createProductDto.name.toLowerCase();
+    const category = await this.categoriesService.findOne(
+      createProductDto.categoryName,
     );
-
     const productNew = new this.productModel({ ...createProductDto });
-    existingCategory.products.push(productNew);
-    existingCategory.save();
+    category.products.push(productNew);
+    category.save();
     return productNew.save();
   }
 
   async update(
-    id: string,
+    name: string,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const existingProduct = await this.productModel
-      .findOneAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
+    return await this.productModel
+      .findOneAndUpdate(
+        { name: name },
+        { $set: updateProductDto },
+        { new: true },
+      )
       .exec();
-    if (!existingProduct) throw new NotFoundException(`No Product Found`);
-    return existingProduct;
   }
 
   async findAll(): Promise<Product[]> {
-    const existingProducts = await this.productModel.find();
-    if (!existingProducts) throw new NotFoundException(`No Product Found`);
-    return existingProducts;
+    return await this.productModel.find();
   }
 
-  async findOne(id: string): Promise<Product> {
-    const existingProduct = await this.productModel.findById(id);
-    if (!existingProduct) throw new NotFoundException(`No Product Found`);
-    return existingProduct;
+  async findOne(name: string): Promise<Product> {
+    return await this.productModel.findOne({ name: name.toLowerCase() });
   }
 
   async searchByName(name: string): Promise<Product[]> {
-    const existingProducts = await this.productModel.find({
+    return await this.productModel.find({
       name: new RegExp(name, 'i'),
     });
-    if (!existingProducts) throw new NotFoundException(`No Product Found`);
-    return existingProducts;
-  }
-
-  async findByCategoryId(categoryId: string): Promise<Product[]> {
-    const existingProducts = await this.productModel.find({ categoryId });
-    if (!existingProducts) throw new NotFoundException(`No Product Found`);
-    return existingProducts;
   }
 }

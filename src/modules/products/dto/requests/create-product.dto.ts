@@ -20,6 +20,6 @@ export class CreateProductDto {
   avatarUrl: string;
 
   @IsString()
-  @ApiProperty({ description: 'Category Id Of Product' })
-  categoryId: string;
+  @ApiProperty({ description: 'Category Name Of Product' })
+  categoryName: string;
 }

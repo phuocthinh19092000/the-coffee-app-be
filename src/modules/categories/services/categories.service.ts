@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from 'src/modules/products/entities/product.entity';
@@ -14,44 +14,42 @@ export class CategoriesService {
   ) {}
 
   async findAll(): Promise<Category[]> {
-    return this.categoryModel.find();
+    return this.categoryModel.find().populate('products');
   }
 
-  async findOne(id: string): Promise<Category> {
-    const existingCategory = await this.categoryModel
-      .findOne({ _id: id })
+  async findOne(name: string): Promise<Category> {
+    return await this.categoryModel
+      .findOne({ name: name.toLowerCase() })
       .populate('products')
       .exec();
-    if (!existingCategory) throw new NotFoundException(`No Category Found`);
-
-    return existingCategory;
   }
 
-  async getProductsByCategoryId(id: string): Promise<Product[]> {
-    const existingCategory = await this.findOne(id);
-    return existingCategory.products;
+  async getProductsByCategoryName(name: string): Promise<Product[]> {
+    const category = await this.findOne(name);
+    return category.products;
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    createCategoryDto.name.toLowerCase();
     const categoryNew = new this.categoryModel(createCategoryDto);
     return categoryNew.save();
   }
 
   async update(
-    id: string,
+    name: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    const existingCategory = await this.categoryModel
-      .findOneAndUpdate({ _id: id }, { $set: updateCategoryDto }, { new: true })
+    const category = await this.categoryModel
+      .findOneAndUpdate(
+        { name: name },
+        { $set: updateCategoryDto },
+        { new: true },
+      )
       .exec();
-    if (!existingCategory) throw new NotFoundException(`No Category Found`);
-    return existingCategory;
+
+    return category;
   }
   async findByName(name: string): Promise<Category> {
-    const existingCategory = await this.categoryModel.findOne({ name });
-    if (!existingCategory) {
-      throw new NotFoundException('No Category found');
-    }
-    return existingCategory;
+    return await this.categoryModel.findOne({ name });
   }
 }
