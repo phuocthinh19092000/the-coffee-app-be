@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Role } from '../../roles/entities/role.entity';
 import validator from 'validator';
 import { UserStatus } from '../constants/user.constant';
 import * as bcrypt from 'bcrypt';
