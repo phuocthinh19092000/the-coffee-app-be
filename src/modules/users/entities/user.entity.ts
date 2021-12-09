@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 import validator from 'validator';
 import { UserStatus } from '../constants/user.constant';
 import * as bcrypt from 'bcrypt';
@@ -7,9 +8,11 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User extends Document {
+  @ApiProperty()
   @Prop({ required: true, unique: true })
   username: string;
 
+  @ApiProperty()
   @Prop({ required: true, private: true })
   password: string;
 
@@ -29,6 +32,7 @@ export class User extends Document {
   @Prop()
   phoneNumber: string;
 
+  @ApiProperty({ default: 3 })
   @Prop({ required: true, default: 3 })
   freeUnit: number;
 
