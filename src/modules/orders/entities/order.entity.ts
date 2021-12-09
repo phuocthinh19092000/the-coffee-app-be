@@ -1,30 +1,37 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
-import { User } from '../../users/entities/user.entity';
+import * as mongoose from 'mongoose';
 import { Product } from '../../products/entities/product.entity';
 import { OrderStatus } from '../constants/order.constant';
 import { BaseEntity } from '../../shared/entities/base.entity';
+import { ApiProperty } from '@nestjs/swagger';
+
 export type OrderDocument = Order & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Order extends BaseEntity {
   @Prop({ required: true })
+  @ApiProperty()
   quantity: number;
 
   @Prop()
+  @ApiProperty()
   note: string;
 
   @Prop({ required: true, default: OrderStatus.new })
+  @ApiProperty()
   orderStatus: OrderStatus;
 
   @Prop()
-  quantityBilled: string;
+  @ApiProperty()
+  quantityBilled: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true })
-  user: User;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Product', require: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+    required: true,
+  })
+  @ApiProperty()
   product: Product;
 }
 
-export const CoffeeSchema = SchemaFactory.createForClass(Order);
+export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -10,11 +10,13 @@ import { UsersModule } from 'src/modules/users/users.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { AppConfigService } from 'src/common/config/config.service';
 import { AppConfigModule } from 'src/common/config/config.module';
+import { OrdersModule } from 'src/modules/orders/orders.module';
 @Module({
   imports: [
     AppConfigModule,
     ProductsModule,
     CategoriesModule,
+    OrdersModule,
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],
       useFactory: async (appConfigService: AppConfigService) => ({

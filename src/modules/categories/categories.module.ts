@@ -11,5 +11,6 @@ import { CategoriesController } from './controllers/categories.controller';
   ],
   controllers: [CategoriesController],
   providers: [CategoriesService],
+  exports: [CategoriesService],
 })
 export class CategoriesModule {}
