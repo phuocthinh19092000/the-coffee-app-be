@@ -28,12 +28,7 @@ export class AuthService {
       sub: _id.toString(),
       role: 'employee',
     };
-    const jwtAccessToken = this.generateAccessToken(payload);
-
-    const { ['_doc']: doc, ..._ } = user;
-    const { password, ...userRespone } = doc;
-
-    return { data: { jwtAccessToken, user: userRespone } };
+    return { jwtAccessToken: this.generateAccessToken(payload) };
   }
 
   private generateAccessToken(payload: Record<string, any>) {

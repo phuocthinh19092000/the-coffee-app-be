@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
 import { LoginDto } from 'src/modules/users/dto/requests/login-dto.dto';
-import { LoginResponeDto } from '../dto/login-respone.dto';
+import { Jwt } from '../dto/jwt.dto';
 import { AuthService } from '../services/auth.service';
 @ApiTags('auth')
 @Controller('auth')
@@ -17,7 +17,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
   @ApiCreatedResponse({
-    type: LoginResponeDto,
+    type: Jwt,
     description: ' login successfully ',
   })
   @ApiUnauthorizedResponse({ description: 'Please authenticate' })
