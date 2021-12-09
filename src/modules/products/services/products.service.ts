@@ -36,18 +36,28 @@ export class ProductsService {
   }
 
   async findAll(): Promise<Product[]> {
-    return this.productModel.find();
+    const existingProducts = await this.productModel.find();
+    if (!existingProducts) throw new NotFoundException(`No Product Found`);
+    return existingProducts;
   }
 
   async findOne(id: string): Promise<Product> {
-    return this.productModel.findById(id);
+    const existingProduct = await this.productModel.findById(id);
+    if (!existingProduct) throw new NotFoundException(`No Product Found`);
+    return existingProduct;
   }
 
-  async findByName(name: string): Promise<Product> {
-    return this.productModel.findOne({ name });
+  async searchByName(name: string): Promise<Product[]> {
+    const existingProducts = await this.productModel.find({
+      name: new RegExp(name, 'i'),
+    });
+    if (!existingProducts) throw new NotFoundException(`No Product Found`);
+    return existingProducts;
   }
 
   async findByCategoryId(categoryId: string): Promise<Product[]> {
-    return this.productModel.find({ categoryId });
+    const existingProducts = await this.productModel.find({ categoryId });
+    if (!existingProducts) throw new NotFoundException(`No Product Found`);
+    return existingProducts;
   }
 }
