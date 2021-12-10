@@ -44,6 +44,10 @@ export class ProductsService {
     return await this.productModel.findOne({ name });
   }
 
+  async findById(id: string): Promise<Product> {
+    return await this.productModel.findById(id);
+  }
+
   async searchByName(name: string): Promise<Product[]> {
     return await this.productModel.find({
       name: new RegExp(name, 'i'),

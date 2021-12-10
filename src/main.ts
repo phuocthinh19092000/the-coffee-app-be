@@ -9,6 +9,7 @@ async function bootstrap() {
     .setTitle('The Coffee App OTSV')
     .setDescription('The Coffee App OTSV API Documentation')
     .setVersion('3.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

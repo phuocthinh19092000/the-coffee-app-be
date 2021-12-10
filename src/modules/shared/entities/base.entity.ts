@@ -1,35 +1,26 @@
 import { Prop } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { User } from '../../users/entities/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 export class BaseEntity extends Document {
-  @Prop({ type: mongoose.Schema.Types.Date, default: Date.now() })
-  createdAt: Date;
-
-  @Prop({ type: mongoose.Schema.Types.Date })
-  updatedAt: Date;
-
-  @Prop({ type: mongoose.Schema.Types.Date })
-  deletedAt: Date;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  })
+  @ApiProperty()
+  createdBy: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    autopopulate: true,
   })
-  createdBy: mongoose.Schema.Types.ObjectId | User;
+  @ApiProperty()
+  updatedBy: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    autopopulate: true,
   })
-  updatedBy: mongoose.Schema.Types.ObjectId | User;
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    autopopulate: true,
-  })
-  deletedBy: mongoose.Schema.Types.ObjectId | User;
+  @ApiProperty()
+  deletedBy: mongoose.Schema.Types.ObjectId;
 }

@@ -1,4 +1,44 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateOrderDto } from '../dto/requests/create-order.dto';
+import { UpdateOrderDto } from '../dto/requests/update-order.dto';
+import { Order } from '../entities/order.entity';
+import { UsersService } from '../../users/services/users.service';
+import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 
 @Injectable()
-export class OrdersService {}
+export class OrdersService {
+  constructor(
+    @InjectModel(Order.name)
+    private readonly orderModel: Model<Order>,
+    private readonly usersService: UsersService,
+  ) {}
+
+  async findAll(): Promise<Order[]> {
+    return await this.orderModel.find();
+  }
+
+  async create(createOrderDto: CreateOrderDto, userID: string): Promise<Order> {
+    const { freeUnit, ...rest } = createOrderDto;
+    const newFreeUnit = freeUnit - rest['quantity'];
+    const newOrder = new this.orderModel({
+      ...rest,
+      quantityBilled: freeUnit > 0 ? newFreeUnit : -rest['quantity'],
+    });
+    const updatedUser: UpdateUserDto = {
+      freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
+    };
+    await this.usersService.updateFreeUnit(userID, updatedUser);
+    return newOrder.save();
+  }
+
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
+    const order = await this.orderModel.findByIdAndUpdate(
+      { _id: id },
+      { $set: updateOrderDto },
+      { new: true },
+    );
+    return order;
+  }
+}
