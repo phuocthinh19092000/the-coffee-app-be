@@ -14,12 +14,10 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    createProductDto.categoryName.toLowerCase();
-    createProductDto.name.toLowerCase();
     const category = await this.categoriesService.findOne(
       createProductDto.categoryName,
     );
-    const productNew = new this.productModel({ ...createProductDto });
+    const productNew = new this.productModel(createProductDto);
     category.products.push(productNew);
     category.save();
     return productNew.save();
@@ -43,7 +41,7 @@ export class ProductsService {
   }
 
   async findOne(name: string): Promise<Product> {
-    return await this.productModel.findOne({ name: name.toLowerCase() });
+    return await this.productModel.findOne({ name });
   }
 
   async searchByName(name: string): Promise<Product[]> {

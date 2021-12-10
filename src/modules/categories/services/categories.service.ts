@@ -19,7 +19,7 @@ export class CategoriesService {
 
   async findOne(name: string): Promise<Category> {
     return await this.categoryModel
-      .findOne({ name: name.toLowerCase() })
+      .findOne({ name })
       .populate('products')
       .exec();
   }
@@ -30,7 +30,7 @@ export class CategoriesService {
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    createCategoryDto.name.toLowerCase();
+    createCategoryDto.name;
     const categoryNew = new this.categoryModel(createCategoryDto);
     return categoryNew.save();
   }
