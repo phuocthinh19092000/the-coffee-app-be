@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +14,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -36,10 +36,11 @@ export class OrdersController {
     private readonly productsService: ProductsService,
   ) {}
 
+  @ApiOperation({ description: 'Get all orders' })
   @Get()
   @ApiOkResponse({
     description: 'Get orders successfully',
-    type: Order,
+    type: [Order],
   })
   findAll(): Promise<Order[]> {
     return this.orderService.findAll();
@@ -59,14 +60,16 @@ export class OrdersController {
     @Body() createOrderDto: CreateOrderDto,
     @User() user,
   ): Promise<Order> {
-    const product = await this.productsService.findById(createOrderDto.product);
+    const product = await this.productsService.findById(
+      createOrderDto.productId,
+    );
     if (!product)
       throw new BadRequestException({
         description: 'Wrong product ID',
         status: 400,
       });
     try {
-      return this.orderService.create(createOrderDto, user._id.toString());
+      return this.orderService.create(createOrderDto, user);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -80,7 +83,7 @@ export class OrdersController {
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'id of category',
+    description: 'ID of Order',
     type: String,
   })
   update(

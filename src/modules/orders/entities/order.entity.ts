@@ -31,7 +31,7 @@ export class Order extends BaseEntity {
     required: true,
   })
   @ApiProperty()
-  product: Product;
+  productId: Product;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -8,14 +8,14 @@ export class BaseEntity extends Document {
     ref: 'User',
   })
   @ApiProperty()
-  createdBy: mongoose.Schema.Types.ObjectId;
+  userId: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
   @ApiProperty()
-  updatedBy: mongoose.Schema.Types.ObjectId;
+  updateBy: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
