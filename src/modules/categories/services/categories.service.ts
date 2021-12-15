@@ -17,34 +17,25 @@ export class CategoriesService {
     return this.categoryModel.find().populate('products');
   }
 
-  async findOne(name: string): Promise<Category> {
-    return await this.categoryModel
-      .findOne({ name })
-      .populate('products')
-      .exec();
+  async findOne(id: string): Promise<Category> {
+    return await this.categoryModel.findById(id).populate('products').exec();
   }
 
-  async getProductsByCategoryName(name: string): Promise<Product[]> {
-    const category = await this.findOne(name);
+  async getProductsByCategory(category: Category): Promise<Product[]> {
     return category.products;
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    createCategoryDto.name;
     const categoryNew = new this.categoryModel(createCategoryDto);
     return categoryNew.save();
   }
 
   async update(
-    name: string,
+    id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     const category = await this.categoryModel
-      .findOneAndUpdate(
-        { name: name },
-        { $set: updateCategoryDto },
-        { new: true },
-      )
+      .findOneAndUpdate({ _id: id }, { $set: updateCategoryDto }, { new: true })
       .exec();
 
     return category;

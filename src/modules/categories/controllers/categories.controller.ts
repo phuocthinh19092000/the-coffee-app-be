@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
@@ -7,6 +16,7 @@ import { Product } from '../../products/entities/product.entity';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
@@ -14,69 +24,90 @@ import {
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
+
+  @ApiOperation({ summary: 'Get All Categories' })
   @Get()
   @ApiOkResponse({
     description: 'Get All Categories successfully.',
-    type: Category,
+    type: [Category],
   })
   findAll(): Promise<Category[]> {
     return this.categoriesService.findAll();
   }
 
-  @Get(':name')
+  @ApiOperation({ summary: 'Get Category By Id' })
+  @Get(':id')
   @ApiOkResponse({
-    description: 'Get category by category Name successfully',
+    description: 'Get category by category id successfully',
     type: Category,
   })
   @ApiParam({
-    name: 'name',
+    name: 'id',
     required: true,
-    description: 'name of category',
+    description: 'id of category',
     type: String,
   })
-  findOne(@Param('name') name: string): Promise<Category> {
-    return this.categoriesService.findOne(name);
+  async findOne(@Param('id') id: string): Promise<Category> {
+    return await this.categoriesService.findOne(id);
   }
 
-  @Get(':name/products')
+  @ApiOperation({ summary: 'Get list products of categoryID' })
+  @Get(':id/products')
   @ApiOkResponse({
-    description: 'Get list products by category Name successfully.',
-    type: Product,
+    description: 'Get list products by category id successfully.',
+    type: [Product],
   })
   @ApiParam({
-    name: 'name',
+    name: 'id',
     required: true,
-    description: 'name of category',
+    description: 'id of category',
     type: String,
   })
-  getProductsByCategoryName(@Param('name') name: string): Promise<Product[]> {
-    return this.categoriesService.getProductsByCategoryName(name);
+  async getProductsByCategoryId(@Param('id') id: string): Promise<Product[]> {
+    const category = await this.findOne(id);
+    return this.categoriesService.getProductsByCategory(category);
   }
 
+  @ApiOperation({ summary: 'Create new category' })
   @Post()
   @ApiCreatedResponse({
     description: 'Create Category successfully.',
     type: Category,
   })
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this.categoriesService.create(createCategoryDto);
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
+    const category = await this.categoriesService.findByName(
+      createCategoryDto.name,
+    );
+    if (category)
+      throw new BadRequestException({
+        description: 'Category name already existed',
+        status: 400,
+      });
+    try {
+      return this.categoriesService.create(createCategoryDto);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
-  @Patch(':name')
+  @ApiOperation({ summary: 'Update Category' })
+  @Patch(':id')
   @ApiOkResponse({
     description: 'Update Category successfully.',
     type: Category,
   })
   @ApiParam({
-    name: 'name',
+    name: 'id',
     required: true,
-    description: 'name of category',
+    description: 'id of category',
     type: String,
   })
   update(
-    @Param('name') name: string,
+    @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    return this.categoriesService.update(name, updateCategoryDto);
+    return this.categoriesService.update(id, updateCategoryDto);
   }
 }

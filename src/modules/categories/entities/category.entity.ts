@@ -18,3 +18,8 @@ export class Category extends Document {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+CategorySchema.method('toJSON', function () {
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
+});

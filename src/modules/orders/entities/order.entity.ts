@@ -7,7 +7,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type OrderDocument = Order & Document;
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+})
 export class Order extends BaseEntity {
   @Prop({ required: true })
   @ApiProperty()

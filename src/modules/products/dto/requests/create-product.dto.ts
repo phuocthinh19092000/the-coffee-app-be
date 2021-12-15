@@ -17,7 +17,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @ApiProperty()
-  avatarUrl: string;
+  images: string;
 
   @IsString()
   @ApiProperty({ description: 'Category Name Of Product' })

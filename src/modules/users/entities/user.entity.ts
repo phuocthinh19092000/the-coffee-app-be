@@ -46,6 +46,7 @@ export class User extends Document {
   // role: Role;
 }
 const UserSchema = SchemaFactory.createForClass(User);
+
 UserSchema.pre('save', async function () {
   if (this.isModified('password')) {
     this.set('password', await bcrypt.hash(this.password, 8));
@@ -53,3 +54,8 @@ UserSchema.pre('save', async function () {
 });
 
 export default UserSchema;
+UserSchema.method('toJSON', function () {
+  const { __v, _id, password, ...object } = this.toObject();
+  object.id = _id;
+  return object;
+});

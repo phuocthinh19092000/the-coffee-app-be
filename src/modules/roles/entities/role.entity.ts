@@ -11,3 +11,8 @@ export class Role extends Document {
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
+RoleSchema.method('toJSON', function () {
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
+});
