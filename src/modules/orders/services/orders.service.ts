@@ -6,6 +6,7 @@ import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 import { Order } from '../entities/order.entity';
 import { UsersService } from '../../users/services/users.service';
 import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
@@ -19,17 +20,18 @@ export class OrdersService {
     return await this.orderModel.find();
   }
 
-  async create(createOrderDto: CreateOrderDto, userID: string): Promise<Order> {
-    const { freeUnit, ...rest } = createOrderDto;
-    const newFreeUnit = freeUnit - rest['quantity'];
+  async create(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
+    const freeUnit = user.freeUnit;
+    const newFreeUnit = freeUnit - createOrderDto['quantity'];
     const newOrder = new this.orderModel({
-      ...rest,
-      quantityBilled: freeUnit > 0 ? newFreeUnit : -rest['quantity'],
+      ...createOrderDto,
+      quantityBilled: newFreeUnit < 0 ? -newFreeUnit : 0,
+      userId: user._id.toString(),
     });
     const updatedUser: UpdateUserDto = {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
-    await this.usersService.updateFreeUnit(userID, updatedUser);
+    await this.usersService.updateFreeUnit(user._id.toString(), updatedUser);
     return newOrder.save();
   }
 
