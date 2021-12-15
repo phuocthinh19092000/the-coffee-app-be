@@ -1,4 +1,3 @@
-import { Prop } from '@nestjs/mongoose';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { OrderStatus } from '../../constants/order.constant';
