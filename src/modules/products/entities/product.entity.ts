@@ -4,7 +4,7 @@ import { ProductStatus } from '../constants/product.constant';
 import * as mongoose from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '../../categories/entities/category.entity';
-
+import toJson from '../../../database/plugins/toJson.js';
 @Schema()
 export class Product extends Document {
   @Prop({ required: true, unique: true })
@@ -37,8 +37,5 @@ export class Product extends Document {
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
-ProductSchema.method('toJSON', function () {
-  const { __v, _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
-});
+
+ProductSchema.plugin(toJson);

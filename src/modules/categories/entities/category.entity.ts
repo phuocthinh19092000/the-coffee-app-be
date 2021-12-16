@@ -3,8 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { Product } from '../../products/entities/product.entity';
 import * as mongoose from 'mongoose';
+import toJson from '../../../database/plugins/toJson.js';
 export type CategoryDocument = Category & Document;
-
 @Schema()
 export class Category extends Document {
   @Prop({ require: true, unique: true })
@@ -18,8 +18,4 @@ export class Category extends Document {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
-CategorySchema.method('toJSON', function () {
-  const { __v, _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
-});
+CategorySchema.plugin(toJson);

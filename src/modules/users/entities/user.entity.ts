@@ -54,8 +54,3 @@ UserSchema.pre('save', async function () {
 });
 
 export default UserSchema;
-UserSchema.method('toJSON', function () {
-  const { __v, _id, password, ...object } = this.toObject();
-  object.id = _id;
-  return object;
-});
