@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -12,7 +13,7 @@ import { UsersService } from 'src/modules/users/services/users.service';
 @Controller('admin/account')
 export class AdminController {
   constructor(private readonly userService: UsersService) {}
-
+  @ApiOperation({ summary: 'Create new account' })
   @ApiCreatedResponse({
     description: 'create new account successfully',
     type: User,
