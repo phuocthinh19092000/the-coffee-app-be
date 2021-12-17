@@ -20,6 +20,6 @@ export class CreateProductDto {
   images: string;
 
   @IsString()
-  @ApiProperty({ description: 'Category Name Of Product' })
-  categoryName: string;
+  @ApiProperty({ description: 'Category Id Of Product' })
+  categoryId: string;
 }

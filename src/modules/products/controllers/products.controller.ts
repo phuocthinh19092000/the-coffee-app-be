@@ -53,8 +53,8 @@ export class ProductsController {
         status: 400,
       });
     }
-    const category = await this.categoriesService.findByName(
-      createProductDto.categoryName,
+    const category = await this.categoriesService.findOne(
+      createProductDto.categoryId,
     );
     if (!category) {
       throw new BadRequestException({
