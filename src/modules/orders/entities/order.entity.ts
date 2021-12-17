@@ -4,6 +4,7 @@ import { Product } from '../../products/entities/product.entity';
 import { OrderStatus } from '../constants/order.constant';
 import { BaseEntity } from '../../shared/entities/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import toJson from 'src/database/plugins/toJson';
 
 export type OrderDocument = Order & Document;
 
@@ -20,7 +21,6 @@ export class Order extends BaseEntity {
   note: string;
 
   @Prop({ required: true, default: OrderStatus.new })
-  @ApiProperty()
   orderStatus: OrderStatus;
 
   @Prop()
@@ -34,6 +34,13 @@ export class Order extends BaseEntity {
   })
   @ApiProperty()
   productId: Product;
+
+  @Prop({
+    type: mongoose.Schema.Types.Date,
+  })
+  createdAt: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+OrderSchema.plugin(toJson);

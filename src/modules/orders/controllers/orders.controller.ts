@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -16,12 +17,14 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { ProductsService } from 'src/modules/products/services/products.service';
+import { OrderStatus } from '../constants/order.constant';
 import { CreateOrderDto } from '../dto/requests/create-order.dto';
 import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 import { Order } from '../entities/order.entity';
@@ -36,16 +39,42 @@ export class OrdersController {
     private readonly productsService: ProductsService,
   ) {}
 
-  @ApiOperation({ description: 'Get all orders' })
-  @Get()
+  @Get('/user')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Get orders by userId - Sort by date',
+    summary: 'Get orders by userId - Sort by date',
+  })
   @ApiOkResponse({
-    description: 'Get orders successfully',
+    description: 'Get orders by UserId successfully',
     type: [Order],
   })
-  findAll(): Promise<Order[]> {
-    return this.orderService.findAll();
+  findByUserId(@User() user): Promise<Order[]> {
+    return this.orderService.findByUserId(user);
   }
 
+  @Get()
+  @ApiOperation({
+    description: 'Get orders by status',
+    summary: 'Get orders by status',
+  })
+  @ApiOkResponse({
+    description: 'Get orders by Status successfully',
+    type: [Order],
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: OrderStatus,
+  })
+  findByStatus(@Query('status') status?: OrderStatus): Promise<Order[]> {
+    return this.orderService.findByStatus(status);
+  }
+
+  @ApiOperation({
+    description: 'Create new order',
+    summary: 'Create new order',
+  })
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({

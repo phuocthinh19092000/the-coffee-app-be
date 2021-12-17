@@ -7,6 +7,7 @@ import { Order } from '../entities/order.entity';
 import { UsersService } from '../../users/services/users.service';
 import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
+import { OrderStatus } from '../constants/order.constant';
 
 @Injectable()
 export class OrdersService {
@@ -17,7 +18,22 @@ export class OrdersService {
   ) {}
 
   async findAll(): Promise<Order[]> {
-    return await this.orderModel.find();
+    return await this.orderModel.find().sort({ createdAt: 'desc' });
+  }
+
+  async findByUserId(user: User): Promise<Order[]> {
+    return await this.orderModel
+      .find({ userId: user._id })
+      .sort({ createdAt: 'desc' });
+  }
+
+  async findByStatus(status: OrderStatus): Promise<Order[]> {
+    if (status) {
+      return await this.orderModel
+        .find({ orderStatus: status })
+        .sort({ createdAt: 'desc' });
+    }
+    return this.findAll();
   }
 
   async create(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
@@ -26,12 +42,12 @@ export class OrdersService {
     const newOrder = new this.orderModel({
       ...createOrderDto,
       quantityBilled: newFreeUnit < 0 ? -newFreeUnit : 0,
-      userId: user._id.toString(),
+      userId: user._id,
     });
     const updatedUser: UpdateUserDto = {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
-    await this.usersService.updateFreeUnit(user._id.toString(), updatedUser);
+    await this.usersService.updateFreeUnit(user._id, updatedUser);
     return newOrder.save();
   }
 
