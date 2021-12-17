@@ -53,4 +53,16 @@ UserSchema.pre('save', async function () {
   }
 });
 
+UserSchema.method('toJSON', function () {
+  const userObject = this.toObject();
+  userObject.id = userObject._id;
+
+  delete userObject.password;
+  delete userObject._id;
+  delete userObject.username;
+  delete userObject.__v;
+
+  return userObject;
+});
+
 export default UserSchema;

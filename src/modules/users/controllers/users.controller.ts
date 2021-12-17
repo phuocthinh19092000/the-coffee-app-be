@@ -2,6 +2,7 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -14,11 +15,11 @@ import { UserInforDto } from '../dto/respone/user-infor.dto';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
+  @ApiOperation({ summary: 'Get user profile' })
   @Get('/profile')
   @ApiOkResponse({ description: 'successfully', type: UserInforDto })
   @ApiUnauthorizedResponse({ description: 'please authenticate' })
   getProfile(@User() user) {
-    const { password, ...restUser } = user._doc;
-    return restUser;
+    return user;
   }
 }

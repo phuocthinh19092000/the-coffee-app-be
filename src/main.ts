@@ -5,7 +5,6 @@ import { ValidationPipe } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin/app';
 import { AppConfigService } from 'src/common/config/config.service';
-import { getMessaging, getToken } from 'firebase/messaging';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const appConfigService = app.get(AppConfigService);

@@ -4,11 +4,7 @@ import * as mongoose from 'mongoose';
 import { UserStatus } from '../../constants/user.constant';
 export class UserInforDto {
   @ApiProperty()
-  _id: mongoose.Schema.Types.ObjectId;
-
-  @ApiProperty()
-  @IsString()
-  username: string;
+  id: mongoose.Schema.Types.ObjectId;
 
   @ApiProperty()
   @IsString()

@@ -2,6 +2,7 @@ import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBody,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -16,6 +17,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
+  @ApiOperation({ summary: 'Login' })
   @ApiUnauthorizedResponse({ description: 'Please authenticate' })
   @ApiOkResponse({ description: 'login successfully', type: Jwt })
   @Post('/login')
