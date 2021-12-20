@@ -36,11 +36,13 @@ export class ProductsService {
       .exec();
   }
   async findAll(): Promise<Product[]> {
-    return await this.productModel.find();
+    return await this.productModel.find().populate('category', 'name');
   }
 
   async findByName(name: string): Promise<Product> {
-    return await this.productModel.findOne({ name });
+    return await this.productModel
+      .findOne({ name })
+      .populate('category', 'name');
   }
 
   async findById(id: string): Promise<Product> {
@@ -48,8 +50,10 @@ export class ProductsService {
   }
 
   async searchByName(name: string): Promise<Product[]> {
-    return await this.productModel.find({
-      name: new RegExp(name, 'i'),
-    });
+    return await this.productModel
+      .find({
+        name: new RegExp(name, 'i'),
+      })
+      .populate('category', 'name');
   }
 }
