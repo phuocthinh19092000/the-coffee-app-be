@@ -31,4 +31,14 @@ export class UsersService {
     );
     return order;
   }
+
+  async updateDeviceToken(user: User, deviceToken: string) {
+    user.deviceToken = deviceToken;
+    return user.save();
+  }
+
+  async removeDeviceToken(user: User) {
+    user.deviceToken = '';
+    return user.save();
+  }
 }
