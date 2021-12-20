@@ -11,8 +11,10 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { AppConfigService } from 'src/common/config/config.service';
 import { AppConfigModule } from 'src/common/config/config.module';
 import { OrdersModule } from 'src/modules/orders/orders.module';
+import { NotificationsModule } from 'src/modules/notification/notifications.module';
 @Module({
   imports: [
+    NotificationsModule,
     AppConfigModule,
     ProductsModule,
     CategoriesModule,

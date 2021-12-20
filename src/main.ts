@@ -2,12 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as admin from 'firebase-admin';
-import { ServiceAccount } from 'firebase-admin/app';
-import { AppConfigService } from 'src/common/config/config.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const appConfigService = app.get(AppConfigService);
 
   const configSwaggerDocument = new DocumentBuilder()
     .setTitle('The Coffee App OTSV')
@@ -28,17 +24,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  const serviceFirebase: ServiceAccount = {
-    projectId: appConfigService.projectId,
-    privateKey: appConfigService.privateKey,
-    clientEmail: appConfigService.clientEmail,
-  };
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceFirebase),
-    databaseURL: appConfigService.firebaseUrl,
-  });
 
   app.enableCors();
 
