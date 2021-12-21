@@ -42,6 +42,9 @@ export class User extends Document {
   @Prop({ required: true, default: UserStatus.active })
   available: UserStatus;
 
+  @Prop()
+  deviceToken: string;
+
   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
   // role: Role;
 }
@@ -61,6 +64,7 @@ UserSchema.method('toJSON', function () {
   delete userObject._id;
   delete userObject.username;
   delete userObject.__v;
+  delete userObject.deviceToken;
 
   return userObject;
 });
