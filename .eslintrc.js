@@ -6,6 +6,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
@@ -14,17 +15,35 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', '.commitlintrc.js', 'init-mongo.js'],
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
     'prettier/prettier': [
       'error',
       {
         endOfLine: 'auto',
       },
     ],
+    eqeqeq: 'error',
+    'no-var': 'error',
+    'no-await-in-loop': 'error',
+    'no-console': 'error',
+    'no-promise-executor-return': 'error',
+    'no-template-curly-in-string': 'error',
+    'no-useless-backreference': 'error',
+    'require-atomic-updates': 'error',
+    '@typescript-eslint/prefer-optional-chain': 'error',
+    '@typescript-eslint/prefer-nullish-coalescing': 'error',
+    '@typescript-eslint/no-confusing-non-null-assertion': 'error',
+    '@typescript-eslint/prefer-for-of': 'error',
+    '@typescript-eslint/no-unnecessary-type-constraint': 'error',
   },
+  overrides: [
+    {
+      files: ['src/**/*.spec.ts'],
+      env: {
+        jest: true,
+      },
+      extends: ['plugin:jest/recommended', 'plugin:jest/style'],
+    },
+  ],
 };
