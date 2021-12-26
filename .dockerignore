@@ -1,0 +1,5 @@
+COPY
+node_modules
+dist
+.git
+.vscode
