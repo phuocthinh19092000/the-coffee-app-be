@@ -1,10 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsEmail, IsOptional } from 'class-validator';
-import * as mongoose from 'mongoose';
 import { UserStatus } from '../../constants/user.constant';
 export class UserInforDto {
   @ApiProperty()
-  id: mongoose.Schema.Types.ObjectId;
+  id: string;
 
   @ApiProperty()
   @IsString()
