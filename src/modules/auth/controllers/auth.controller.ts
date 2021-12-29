@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBody,
   ApiInternalServerErrorResponse,
@@ -7,10 +7,13 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { User } from 'src/decorators/user.decorator';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
-import { LoginDto } from 'src/modules/users/dto/requests/login-dto.dto';
+import { LoginDto } from 'src/modules/auth/dto/login.dto';
+
 import { UsersService } from 'src/modules/users/services/users.service';
 import { Jwt } from '../dto/jwt.dto';
+import { LogoutDto } from '../dto/logout.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../services/auth.service';
 @ApiTags('auth')
@@ -37,11 +40,12 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Logout' })
   @ApiOkResponse({ description: 'logout successfully' })
+  @ApiBody({ type: LogoutDto })
   @ApiInternalServerErrorResponse({ description: 'logout Failed' })
   @UseGuards(JwtAuthGuard)
   @Post('/logout')
-  async logout(@Req() req, @Res() res) {
-    await this.userService.removeDeviceToken(req.user);
+  async logout(@Body() logout: LogoutDto, @User() user, @Res() res) {
+    await this.userService.removeDeviceToken(user, logout.deviceToken);
     res.status(200).send();
   }
 }

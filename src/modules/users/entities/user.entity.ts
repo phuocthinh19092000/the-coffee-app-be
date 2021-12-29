@@ -43,7 +43,7 @@ export class User extends Document {
   available: UserStatus;
 
   @Prop()
-  deviceToken: string;
+  deviceToken: string[];
 
   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
   // role: Role;

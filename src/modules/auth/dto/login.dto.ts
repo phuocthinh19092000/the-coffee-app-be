@@ -11,7 +11,7 @@ export class LoginDto {
   @MaxLength(32)
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @IsString()
   deviceToken: string;
 }

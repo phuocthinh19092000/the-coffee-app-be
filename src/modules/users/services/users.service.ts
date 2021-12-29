@@ -33,12 +33,15 @@ export class UsersService {
   }
 
   async updateDeviceToken(user: User, deviceToken: string) {
-    user.deviceToken = deviceToken;
+    user.deviceToken.push(deviceToken);
     return user.save();
   }
 
-  async removeDeviceToken(user: User) {
-    user.deviceToken = '';
+  async removeDeviceToken(user: User, deviceToken: string) {
+    user.deviceToken = user.deviceToken.filter(
+      (token) => token !== deviceToken,
+    );
+
     return user.save();
   }
 }
