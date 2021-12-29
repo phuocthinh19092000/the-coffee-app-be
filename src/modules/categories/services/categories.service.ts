@@ -14,14 +14,19 @@ export class CategoriesService {
   ) {}
 
   async findAll(): Promise<Category[]> {
-    return this.categoryModel.find().populate('products');
+    return this.categoryModel.find().sort({ name: 0 });
   }
 
   async findOne(id: string): Promise<Category> {
     return await this.categoryModel.findById(id).populate('products').exec();
   }
 
-  async getProductsByCategory(category: Category): Promise<Product[]> {
+  async getProductsByCategory(categoryId: string): Promise<Product[]> {
+    const category = await this.categoryModel.findById(categoryId).populate({
+      path: 'products',
+      options: { sort: { name: 1 } },
+    });
+
     return category.products;
   }
 

@@ -64,8 +64,7 @@ export class CategoriesController {
     type: String,
   })
   async getProductsByCategoryId(@Param('id') id: string): Promise<Product[]> {
-    const category = await this.findOne(id);
-    return this.categoriesService.getProductsByCategory(category);
+    return this.categoriesService.getProductsByCategory(id);
   }
 
   @ApiOperation({ summary: 'Create new category' })
