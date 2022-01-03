@@ -32,7 +32,7 @@ export class AuthController {
   @Post('/login')
   async login(@Req() req, @Res() res) {
     if (req.body.deviceToken) {
-      await this.userService.updateDeviceToken(req.user, req.body.deviceToken);
+      await this.userService.addDeviceToken(req.user, req.body.deviceToken);
     }
     const jwt = await this.authService.login(req.user);
     res.status(200).send(jwt);
