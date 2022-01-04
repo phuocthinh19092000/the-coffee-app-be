@@ -1,7 +1,7 @@
 export enum OrderStatus {
   new = 'new',
   processing = 'processing',
-  ready = 'ready',
-  pickedUp = 'pickedUp',
-  cancelled = 'cancelled',
+  ready = 'ready for pickup',
+  pickedUp = 'picked up',
+  canceled = 'canceled',
 }
