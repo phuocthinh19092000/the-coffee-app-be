@@ -12,6 +12,8 @@ import { AppConfigService } from 'src/common/config/config.service';
 import { AppConfigModule } from 'src/common/config/config.module';
 import { OrdersModule } from 'src/modules/orders/orders.module';
 import { NotificationsModule } from 'src/modules/notification/notifications.module';
+import { StatusModule } from 'src/modules/status/status.module';
+
 @Module({
   imports: [
     NotificationsModule,
@@ -31,6 +33,7 @@ import { NotificationsModule } from 'src/modules/notification/notifications.modu
     UsersModule,
     CategoriesModule,
     AuthModule,
+    StatusModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
