@@ -32,8 +32,10 @@ export class UsersService {
     return order;
   }
 
-  async updateDeviceToken(user: User, deviceToken: string) {
-    user.deviceToken.push(deviceToken);
+  async addDeviceToken(user: User, deviceToken: string) {
+    if (!user.deviceToken.includes(deviceToken)) {
+      user.deviceToken.push(deviceToken);
+    }
     return user.save();
   }
 
