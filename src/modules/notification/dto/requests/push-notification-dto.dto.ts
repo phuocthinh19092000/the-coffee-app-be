@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
-import {} from 'firebase-admin/lib/messaging/messaging-api';
-
+import { ArrayUnique, IsString } from 'class-validator';
+import { IsSpecificTypeArray } from 'src/decorators/custom-validation-decorators/validation.pipe';
 export class PushNotificationDto {
   @ApiProperty()
-  @IsString()
-  deviceToken: string;
+  @ArrayUnique()
+  @IsSpecificTypeArray('string')
+  deviceToken: string[];
 
   @ApiProperty()
   @IsString()
