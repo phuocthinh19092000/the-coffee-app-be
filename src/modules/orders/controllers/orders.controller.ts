@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -24,9 +25,11 @@ import {
 import { User } from 'src/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { ProductsService } from 'src/modules/products/services/products.service';
+import { StatusService } from 'src/modules/status/services/status.service';
 import { OrderStatus } from '../constants/order.constant';
 import { CreateOrderDto } from '../dto/requests/create-order.dto';
 import { UpdateOrderDto } from '../dto/requests/update-order.dto';
+import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
 
@@ -37,6 +40,7 @@ export class OrdersController {
   constructor(
     private readonly orderService: OrdersService,
     private readonly productsService: ProductsService,
+    private readonly statusService: StatusService,
   ) {}
 
   @Get('/user')
@@ -67,8 +71,8 @@ export class OrdersController {
     required: false,
     enum: OrderStatus,
   })
-  findByStatus(@Query('status') status?: OrderStatus): Promise<Order[]> {
-    return this.orderService.findByStatus(status);
+  findByStatus(@Query('status') statusName: string): Promise<Order[]> {
+    return this.orderService.findByStatus(statusName);
   }
 
   @ApiOperation({
@@ -92,13 +96,15 @@ export class OrdersController {
     const product = await this.productsService.findById(
       createOrderDto.productId,
     );
-    if (!product)
+
+    if (!product) {
       throw new BadRequestException({
         description: 'Wrong product ID',
         status: 400,
       });
+    }
     try {
-      return this.orderService.create(createOrderDto, user);
+      return await this.orderService.create(createOrderDto, user);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -109,16 +115,28 @@ export class OrdersController {
     description: 'Update Order successfully',
     type: UpdateOrderDto,
   })
+  @ApiBadRequestResponse({ description: 'Invalid status' })
   @ApiParam({
     name: 'id',
     required: true,
     description: 'ID of Order',
     type: String,
   })
-  update(
+  async updateStatus(
     @Param('id') id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
+    @Body() updateStatusOrderDto: UpdateStatusOrderDto,
   ): Promise<Order> {
-    return this.orderService.update(id, updateOrderDto);
+    const order = await this.orderService.findById(id);
+    const currentStatus = order.statusId.value;
+    const newStatus = updateStatusOrderDto.status;
+
+    if (
+      newStatus === currentStatus + 1 ||
+      (currentStatus === 0 && newStatus === -1)
+    ) {
+      return this.orderService.updateStatus(order, newStatus);
+    } else {
+      throw new BadRequestException({ description: 'Invalid order status' });
+    }
   }
 }
