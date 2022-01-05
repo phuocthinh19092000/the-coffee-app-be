@@ -2,7 +2,7 @@ name: Deploy AWS Server
 
 on: 
   push: 
-    branches: [ develop ]
+    branches: [ main ]
 
 jobs:
   build: 
