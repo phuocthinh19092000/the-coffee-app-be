@@ -1,7 +1,8 @@
 import {
-  BadRequestException,
   Body,
   Controller,
+  InternalServerErrorException,
+  Logger,
   Post,
   Res,
 } from '@nestjs/common';
@@ -19,7 +20,7 @@ import { NotificationsService } from '../services/notifications.service';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @ApiOperation({ summary: 'Send notification to single device' })
+  @ApiOperation({ summary: 'Send notification' })
   @ApiOkResponse({
     description: 'Send notification successfully',
   })
@@ -31,16 +32,21 @@ export class NotificationsController {
     @Body() pushNotificationDto: PushNotificationDto,
     @Res() res,
   ) {
-    const response = await this.notificationsService.sendNotification(
-      pushNotificationDto,
-    );
+    try {
+      const response = await this.notificationsService.sendNotification(
+        pushNotificationDto,
+      );
 
-    if (response.failureCount > 0) {
-      throw new BadRequestException({
-        description: 'Invalid device Token',
-        status: 400,
+      if (response.failureCount) {
+        throw new Error(`${response.results[0].error}`);
+      }
+      res.status(200).send(response);
+    } catch (err) {
+      Logger.error(err);
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: err.message,
       });
     }
-    res.status(200).send(response);
   }
 }

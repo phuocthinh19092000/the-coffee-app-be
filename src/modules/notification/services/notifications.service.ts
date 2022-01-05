@@ -24,6 +24,7 @@ export class NotificationsService {
 
   async sendNotification(
     pushNotificationDto: PushNotificationDto,
+    data?: { [key: string]: string },
   ): Promise<MessagingDevicesResponse> {
     const { deviceToken, title, message } = pushNotificationDto;
     const payload: MessagingPayload = {
@@ -32,6 +33,9 @@ export class NotificationsService {
         body: message,
       },
     };
+    if (data) {
+      payload.data = data;
+    }
 
     return admin.messaging().sendToDevice(deviceToken, payload);
   }
