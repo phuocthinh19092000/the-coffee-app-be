@@ -25,6 +25,7 @@ export class OrdersService {
     return await this.orderModel
       .find({ userId: user._id })
       .populate({ path: 'statusId', select: ['name', 'value'] })
+      .populate({ path: 'productId', select: ['images', 'name', 'price'] })
       .sort({ createdAt: 'desc' });
   }
 
