@@ -5,7 +5,9 @@ import {
   MaxLength,
   IsEmail,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
+import { RoleType } from 'src/modules/roles/constants/role.constant';
 export class CreateUserDto {
   @ApiProperty()
   @IsString()
@@ -33,4 +35,9 @@ export class CreateUserDto {
   @IsOptional()
   @ApiPropertyOptional()
   avatarUrl: string;
+
+  @IsString()
+  @ApiProperty()
+  @IsEnum(RoleType)
+  roleName: string;
 }

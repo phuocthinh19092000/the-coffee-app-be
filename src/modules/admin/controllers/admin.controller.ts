@@ -5,6 +5,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { RolesService } from 'src/modules/roles/services/roles.service';
 
 import { CreateUserDto } from 'src/modules/users/dto/requests/create-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -12,7 +13,10 @@ import { UsersService } from 'src/modules/users/services/users.service';
 @ApiTags('admin/account')
 @Controller('admin/account')
 export class AdminController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly rolesService: RolesService,
+  ) {}
   @ApiOperation({ summary: 'Create new account' })
   @ApiCreatedResponse({
     description: 'create new account successfully',
@@ -29,6 +33,12 @@ export class AdminController {
       throw new BadRequestException('username already existed');
     }
 
-    return this.userService.createUser(createUserDto);
+    const role = await this.rolesService.findByName(createUserDto.roleName);
+
+    if (!role) {
+      throw new BadRequestException('role is not existed');
+    }
+
+    return this.userService.createUser(createUserDto, role._id);
   }
 }

@@ -8,7 +8,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
-import { LocalAuthGuard } from 'src/guards/local-auth.guard';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 
 import { UsersService } from 'src/modules/users/services/users.service';
