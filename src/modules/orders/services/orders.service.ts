@@ -7,6 +7,7 @@ import { UsersService } from '../../users/services/users.service';
 import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { StatusService } from 'src/modules/status/services/status.service';
+import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
 
 @Injectable()
 export class OrdersService {
@@ -21,12 +22,18 @@ export class OrdersService {
     return await this.orderModel.find().sort({ createdAt: 'desc' });
   }
 
-  async findByUserId(user: User): Promise<Order[]> {
+  async findByUserId(
+    user: User,
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<Order[]> {
+    const { limit, offset } = paginationQueryDto;
     return await this.orderModel
       .find({ userId: user._id })
       .populate({ path: 'orderStatus', select: ['name', 'value'] })
       .populate({ path: 'productId', select: ['images', 'name', 'price'] })
-      .sort({ createdAt: 'desc' });
+      .sort({ createdAt: 'desc' })
+      .skip(offset)
+      .limit(limit);
   }
 
   async findByStatus(statusName: string): Promise<Order[]> {
