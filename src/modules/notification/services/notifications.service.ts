@@ -28,13 +28,14 @@ export class NotificationsService {
   ): Promise<MessagingDevicesResponse> {
     const { deviceToken, title, message } = pushNotificationDto;
     const payload: MessagingPayload = {
-      notification: {
+      data: {
         title: title,
         body: message,
       },
     };
+
     if (data) {
-      payload.data = data;
+      payload.data.data = JSON.stringify(data);
     }
 
     return admin.messaging().sendToDevice(deviceToken, payload);
