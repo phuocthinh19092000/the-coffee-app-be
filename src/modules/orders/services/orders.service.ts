@@ -54,8 +54,7 @@ export class OrdersService {
     const updatedUser: UpdateUserDto = {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
-    statusNew.orders.push(newOrder);
-    statusNew.save();
+
     this.usersService.updateFreeUnit(user._id, updatedUser);
     return newOrder.save();
   }
