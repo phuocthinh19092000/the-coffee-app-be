@@ -24,7 +24,7 @@ export class StatusController {
 
   @Get()
   @ApiOperation({ summary: 'Get all status' })
-  @ApiOkResponse()
+  @ApiOkResponse({ type: [Status] })
   @ApiInternalServerErrorResponse()
   async getAllStatus() {
     return this.statusService.findAll();
