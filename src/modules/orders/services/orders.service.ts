@@ -24,7 +24,7 @@ export class OrdersService {
   async findByUserId(user: User): Promise<Order[]> {
     return await this.orderModel
       .find({ userId: user._id })
-      .populate({ path: 'statusId', select: ['name', 'value'] })
+      .populate({ path: 'orderStatus', select: ['name', 'value'] })
       .populate({ path: 'productId', select: ['images', 'name', 'price'] })
       .sort({ createdAt: 'desc' });
   }
@@ -48,7 +48,7 @@ export class OrdersService {
       ...createOrderDto,
       quantityBilled: newFreeUnit < 0 ? -newFreeUnit : 0,
       userId: user._id,
-      statusId: statusNew._id,
+      orderStatus: statusNew._id,
     });
 
     const updatedUser: UpdateUserDto = {
@@ -61,14 +61,13 @@ export class OrdersService {
 
   async updateStatus(order: Order, newStatus: number) {
     const status = await this.statusService.findByValue(newStatus);
-    order.statusId = status._id;
+    order.orderStatus = status._id;
     return order.save();
   }
 
   async findById(id: string): Promise<Order> {
     return await this.orderModel
       .findById(id)
-      .populate({ path: 'statusId' })
-      .populate({ path: 'productId' });
+      .populate({ path: 'orderStatus', select: 'value' });
   }
 }

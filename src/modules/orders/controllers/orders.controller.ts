@@ -155,7 +155,7 @@ export class OrdersController {
     @User() user,
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
-    const currentStatus = order.statusId.value;
+    const currentStatus = order.orderStatus.value;
     const newStatus = updateStatusOrderDto.status;
 
     if (
@@ -167,14 +167,14 @@ export class OrdersController {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
           title: TitleOrder,
-          message: `${MessageUpdateOrder} ${order.statusId.name}`,
+          message: `${MessageUpdateOrder} ${order.orderStatus.name}`,
         };
 
         const orderData = {
           quantity: order.quantity.toString(),
           price: order.productId.price.toString(),
           title: order.productId.name,
-          status: order.statusId.name,
+          status: order.orderStatus.name,
         };
 
         this.notificationsService.sendNotification(notification, orderData);

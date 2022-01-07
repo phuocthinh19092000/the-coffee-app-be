@@ -26,7 +26,7 @@ export class Order extends BaseEntity {
     required: true,
   })
   @ApiProperty()
-  statusId: Status;
+  orderStatus: Status;
 
   @Prop()
   @ApiProperty()
