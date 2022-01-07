@@ -33,6 +33,7 @@ import {
   OrderStatus,
   TitleOrder,
 } from '../constants/order.constant';
+import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
 import { CreateOrderDto } from '../dto/requests/create-order.dto';
 import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
@@ -59,8 +60,11 @@ export class OrdersController {
     description: 'Get orders by UserId successfully',
     type: [Order],
   })
-  findByUserId(@User() user): Promise<Order[]> {
-    return this.orderService.findByUserId(user);
+  async findByUserId(
+    @User() user,
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<Order[]> {
+    return this.orderService.findByUserId(user, paginationQueryDto);
   }
 
   @Get()
