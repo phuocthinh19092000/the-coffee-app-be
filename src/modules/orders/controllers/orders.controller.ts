@@ -24,9 +24,15 @@ import {
 } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { PushNotificationDto } from 'src/modules/notification/dto/requests/push-notification-dto.dto';
+import { NotificationsService } from 'src/modules/notification/services/notifications.service';
 import { ProductsService } from 'src/modules/products/services/products.service';
-import { StatusService } from 'src/modules/status/services/status.service';
-import { OrderStatus } from '../constants/order.constant';
+import {
+  MessageNewOrder,
+  MessageUpdateOrder,
+  OrderStatus,
+  TitleOrder,
+} from '../constants/order.constant';
 import { CreateOrderDto } from '../dto/requests/create-order.dto';
 import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
@@ -40,7 +46,7 @@ export class OrdersController {
   constructor(
     private readonly orderService: OrdersService,
     private readonly productsService: ProductsService,
-    private readonly statusService: StatusService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   @Get('/user')
@@ -103,8 +109,28 @@ export class OrdersController {
         status: 400,
       });
     }
+
     try {
-      return await this.orderService.create(createOrderDto, user);
+      const order = await this.orderService.create(createOrderDto, user);
+
+      if (user.deviceToken.length > 0) {
+        const notification: PushNotificationDto = {
+          deviceToken: user.deviceToken,
+          title: TitleOrder,
+          message: MessageNewOrder,
+        };
+
+        const orderData = {
+          quantity: createOrderDto.quantity.toString(),
+          price: product.price.toString(),
+          title: product.name,
+          status: 'new',
+        };
+
+        this.notificationsService.sendNotification(notification, orderData);
+      }
+
+      return order;
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -122,9 +148,11 @@ export class OrdersController {
     description: 'ID of Order',
     type: String,
   })
+  @UseGuards(JwtAuthGuard)
   async updateStatus(
     @Param('id') id: string,
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
+    @User() user,
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
     const currentStatus = order.statusId.value;
@@ -134,7 +162,24 @@ export class OrdersController {
       newStatus === currentStatus + 1 ||
       (currentStatus === 0 && newStatus === -1)
     ) {
-      return this.orderService.updateStatus(order, newStatus);
+      const updatedOrder = this.orderService.updateStatus(order, newStatus);
+      if (user.deviceToken.length > 0) {
+        const notification: PushNotificationDto = {
+          deviceToken: user.deviceToken,
+          title: TitleOrder,
+          message: `${MessageUpdateOrder} ${order.statusId.name}`,
+        };
+
+        const orderData = {
+          quantity: order.quantity.toString(),
+          price: order.productId.price.toString(),
+          title: order.productId.name,
+          status: order.statusId.name,
+        };
+
+        this.notificationsService.sendNotification(notification, orderData);
+      }
+      return updatedOrder;
     } else {
       throw new BadRequestException({ description: 'Invalid order status' });
     }

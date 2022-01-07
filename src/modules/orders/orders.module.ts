@@ -6,12 +6,14 @@ import { Order, OrderSchema } from './entities/order.entity';
 import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
 import { StatusModule } from '../status/status.module';
+import { NotificationsModule } from '../notification/notifications.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     UsersModule,
     ProductsModule,
     StatusModule,
+    NotificationsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
