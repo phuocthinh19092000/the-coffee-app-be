@@ -75,6 +75,7 @@ export class OrdersService {
   async findById(id: string): Promise<Order> {
     return await this.orderModel
       .findById(id)
-      .populate({ path: 'orderStatus', select: 'value' });
+      .populate({ path: 'product', select: ['price', 'name'] })
+      .populate({ path: 'orderStatus', select: ['value', 'name'] });
   }
 }

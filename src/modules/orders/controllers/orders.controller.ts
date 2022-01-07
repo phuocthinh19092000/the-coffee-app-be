@@ -39,6 +39,7 @@ import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
+import { StatusService } from 'src/modules/status/services/status.service';
 
 @Controller('orders')
 @ApiBearerAuth()
@@ -48,6 +49,7 @@ export class OrdersController {
     private readonly orderService: OrdersService,
     private readonly productsService: ProductsService,
     private readonly notificationsService: NotificationsService,
+    private readonly statusService: StatusService,
   ) {}
 
   @Get('/user')
@@ -158,7 +160,11 @@ export class OrdersController {
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
     const currentStatus = order.orderStatus.value;
+
     const newStatus = updateStatusOrderDto.status;
+    const nameNewStatus = await (
+      await this.statusService.findByValue(newStatus)
+    ).name;
 
     if (
       newStatus === currentStatus + 1 ||
@@ -176,11 +182,12 @@ export class OrdersController {
           quantity: order.quantity.toString(),
           price: order.product.price.toString(),
           title: order.product.name,
-          status: order.orderStatus.name,
+          status: nameNewStatus,
         };
 
         this.notificationsService.sendNotification(notification, orderData);
       }
+
       return updatedOrder;
     } else {
       throw new BadRequestException({ description: 'Invalid order status' });
