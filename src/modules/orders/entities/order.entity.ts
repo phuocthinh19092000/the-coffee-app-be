@@ -38,7 +38,7 @@ export class Order extends BaseEntity {
     required: true,
   })
   @ApiProperty()
-  productId: Product;
+  product: Product;
 
   @Prop({
     type: mongoose.Schema.Types.Date,
