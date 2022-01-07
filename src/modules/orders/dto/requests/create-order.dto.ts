@@ -12,5 +12,5 @@ export class CreateOrderDto {
 
   @ApiProperty()
   @IsString()
-  productId: string;
+  product: string;
 }

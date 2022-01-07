@@ -30,7 +30,7 @@ export class OrdersService {
     return await this.orderModel
       .find({ userId: user._id })
       .populate({ path: 'orderStatus', select: ['name', 'value'] })
-      .populate({ path: 'productId', select: ['images', 'name', 'price'] })
+      .populate({ path: 'product', select: ['images', 'name', 'price'] })
       .sort({ createdAt: 'desc' })
       .skip(offset)
       .limit(limit);

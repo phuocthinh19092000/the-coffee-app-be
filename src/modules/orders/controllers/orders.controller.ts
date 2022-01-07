@@ -103,9 +103,7 @@ export class OrdersController {
     @Body() createOrderDto: CreateOrderDto,
     @User() user,
   ): Promise<Order> {
-    const product = await this.productsService.findById(
-      createOrderDto.productId,
-    );
+    const product = await this.productsService.findById(createOrderDto.product);
 
     if (!product) {
       throw new BadRequestException({
@@ -176,8 +174,8 @@ export class OrdersController {
 
         const orderData = {
           quantity: order.quantity.toString(),
-          price: order.productId.price.toString(),
-          title: order.productId.name,
+          price: order.product.price.toString(),
+          title: order.product.name,
           status: order.orderStatus.name,
         };
 
