@@ -41,6 +41,7 @@ import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
 import { StatusService } from 'src/modules/status/services/status.service';
+import { PushNotificationGoogleChatDto } from 'src/modules/notification/dto/requests/push-notification-google-chat.dto';
 
 @Controller('orders')
 @ApiBearerAuth()
@@ -142,6 +143,9 @@ export class OrdersController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update status order',
+  })
   @ApiOkResponse({
     description: 'Update Order successfully',
     type: UpdateOrderDto,
@@ -186,7 +190,14 @@ export class OrdersController {
           title: order.product.name,
           status: nameNewStatus,
         };
+        const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
+          webHook: user.webHook,
+          message: `${MessageUpdateOrder} ${nameNewStatus}`,
+        };
 
+        this.notificationsService.sendNotificationToGoogleChat(
+          pushNotificationGoogleChatDto,
+        );
         this.notificationsService.sendNotification(notification, orderData);
       }
 

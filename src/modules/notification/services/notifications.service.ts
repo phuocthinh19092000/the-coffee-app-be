@@ -5,11 +5,18 @@ import {
   MessagingDevicesResponse,
   MessagingPayload,
 } from 'firebase-admin/lib/messaging/messaging-api';
+import { lastValueFrom } from 'rxjs';
 import { AppConfigService } from 'src/common/config/config.service';
 import { PushNotificationDto } from '../dto/requests/push-notification-dto.dto';
+import { PushNotificationGoogleChatDto } from '../dto/requests/push-notification-google-chat.dto';
+import { AxiosResponse } from 'axios';
+import { HttpService } from '@nestjs/axios';
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly appConfigService: AppConfigService) {
+  constructor(
+    private readonly appConfigService: AppConfigService,
+    private httpService: HttpService,
+  ) {
     const serviceFirebase: ServiceAccount = {
       projectId: appConfigService.projectId,
       privateKey: appConfigService.privateKey,
@@ -39,5 +46,19 @@ export class NotificationsService {
     }
 
     return admin.messaging().sendToDevice(deviceToken, payload);
+  }
+  async sendNotificationToGoogleChat(
+    pushNotificationGoogleChatDto: PushNotificationGoogleChatDto,
+  ): Promise<AxiosResponse> {
+    const data = {
+      text: pushNotificationGoogleChatDto.message,
+    };
+
+    const observableResponse = this.httpService.post(
+      pushNotificationGoogleChatDto.webHook,
+      data,
+    );
+
+    return lastValueFrom(observableResponse);
   }
 }
