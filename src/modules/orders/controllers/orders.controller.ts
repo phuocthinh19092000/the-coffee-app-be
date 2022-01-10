@@ -31,6 +31,7 @@ import {
   MessageNewOrder,
   MessageUpdateOrder,
   OrderStatus,
+  OrderStatusNumber,
   TitleOrder,
 } from '../constants/order.constant';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
@@ -168,14 +169,15 @@ export class OrdersController {
 
     if (
       newStatus === currentStatus + 1 ||
-      (currentStatus === 0 && newStatus === -1)
+      (currentStatus === OrderStatusNumber.new &&
+        newStatus === OrderStatusNumber.canceled)
     ) {
       const updatedOrder = this.orderService.updateStatus(order, newStatus);
       if (user.deviceToken.length > 0) {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
           title: TitleOrder,
-          message: `${MessageUpdateOrder} ${order.orderStatus.name}`,
+          message: `${MessageUpdateOrder} ${nameNewStatus}`,
         };
 
         const orderData = {

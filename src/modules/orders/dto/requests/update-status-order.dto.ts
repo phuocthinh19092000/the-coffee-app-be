@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsEnum, IsNumber } from 'class-validator';
+import { OrderStatusNumber } from '../../constants/order.constant';
 
 export class UpdateStatusOrderDto {
   @IsNumber()
   @ApiProperty()
+  @IsEnum(OrderStatusNumber)
   status: number;
 }
