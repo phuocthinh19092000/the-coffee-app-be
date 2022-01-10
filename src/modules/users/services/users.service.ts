@@ -10,8 +10,11 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const user = new this.userModel(createUserDto);
+  async createUser(createUserDto: CreateUserDto, role: string): Promise<User> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { roleName, ...newUser } = createUserDto;
+    newUser['role'] = role;
+    const user = new this.userModel(newUser);
     return user.save();
   }
 
@@ -20,7 +23,7 @@ export class UsersService {
   }
 
   async findUserById(_id: string): Promise<User | undefined> {
-    return this.userModel.findById(_id);
+    return (await this.userModel.findById(_id)).populate('role');
   }
 
   async updateFreeUnit(id: string, updateUserDto: UpdateUserDto) {

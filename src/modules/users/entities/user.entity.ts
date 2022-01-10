@@ -1,9 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import validator from 'validator';
 import { UserStatus } from '../constants/user.constant';
 import * as bcrypt from 'bcrypt';
+import { Role } from 'src/modules/roles/entities/role.entity';
 export type UserDocument = User & Document;
 
 @Schema()
@@ -45,8 +47,8 @@ export class User extends Document {
   @Prop()
   deviceToken: string[];
 
-  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
-  // role: Role;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
+  role: Role;
 }
 const UserSchema = SchemaFactory.createForClass(User);
 

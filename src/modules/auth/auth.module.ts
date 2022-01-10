@@ -7,6 +7,7 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controllers/auth.controller';
 import { JwtStrategy } from './strategy/jwt.strategy';
+
 @Module({
   imports: [
     AppConfigModule,

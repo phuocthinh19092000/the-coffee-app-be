@@ -13,14 +13,10 @@ import { AppConfigModule } from 'src/common/config/config.module';
 import { OrdersModule } from 'src/modules/orders/orders.module';
 import { NotificationsModule } from 'src/modules/notification/notifications.module';
 import { StatusModule } from 'src/modules/status/status.module';
+import { RolesModule } from 'src/modules/roles/roles.module';
 
 @Module({
   imports: [
-    NotificationsModule,
-    AppConfigModule,
-    ProductsModule,
-    CategoriesModule,
-    OrdersModule,
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],
       useFactory: async (appConfigService: AppConfigService) => ({
@@ -29,6 +25,12 @@ import { StatusModule } from 'src/modules/status/status.module';
       }),
       inject: [AppConfigService],
     }),
+    NotificationsModule,
+    AppConfigModule,
+    ProductsModule,
+    CategoriesModule,
+    OrdersModule,
+    RolesModule,
     AdminModule,
     UsersModule,
     CategoriesModule,

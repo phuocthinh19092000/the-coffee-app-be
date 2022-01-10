@@ -7,11 +7,11 @@ export enum RolePermission {
 export enum RoleType {
   admin = 'admin',
   vendor = 'vendor',
-  employee = 'employee',
+  customer = 'customer',
 }
 
 export const roleConfig = {
   [RoleType.admin]: [RolePermission.manageUsers],
   [RoleType.vendor]: [RolePermission.manageOrders],
-  [RoleType.employee]: [RolePermission.placeOrder],
+  [RoleType.customer]: [RolePermission.placeOrder],
 };
