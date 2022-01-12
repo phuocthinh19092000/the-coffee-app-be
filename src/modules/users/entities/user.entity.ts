@@ -49,6 +49,9 @@ export class User extends Document {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Role' })
   role: Role;
+
+  @Prop()
+  webHook: string;
 }
 const UserSchema = SchemaFactory.createForClass(User);
 
@@ -67,6 +70,7 @@ UserSchema.method('toJSON', function () {
   delete userObject.username;
   delete userObject.__v;
   delete userObject.deviceToken;
+  delete userObject.webHook;
 
   return userObject;
 });

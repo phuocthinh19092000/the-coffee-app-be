@@ -11,7 +11,6 @@ import {
 import { User } from 'src/decorators/user.decorator';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
-
 import { UsersService } from 'src/modules/users/services/users.service';
 import { Jwt } from '../dto/jwt.dto';
 import { LogoutDto } from '../dto/logout.dto';
@@ -43,6 +42,7 @@ export class AuthController {
   @ApiOkResponse({ description: 'logout successfully' })
   @ApiBody({ type: LogoutDto })
   @ApiInternalServerErrorResponse({ description: 'logout Failed' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('/logout')

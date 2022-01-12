@@ -46,7 +46,11 @@ export class UsersService {
     user.deviceToken = user.deviceToken.filter(
       (token) => token !== deviceToken,
     );
+    return user.save();
+  }
 
+  async updateWebHook(user: User, webHook: string) {
+    user.webHook = webHook;
     return user.save();
   }
 }

@@ -13,6 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PushNotificationDto } from '../dto/requests/push-notification-dto.dto';
+import { PushNotificationGoogleChatDto } from '../dto/requests/push-notification-google-chat.dto';
 import { NotificationsService } from '../services/notifications.service';
 
 @ApiTags('notifications')
@@ -43,6 +44,38 @@ export class NotificationsController {
       res.status(200).send(response);
     } catch (err) {
       Logger.error(err);
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: err.message,
+      });
+    }
+  }
+
+  @ApiOperation({ summary: 'Send notification to google chat' })
+  @ApiOkResponse({
+    description: 'Send notification  to google chat successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid web hook link',
+  })
+  @Post('/google-chat')
+  async sendNotificationToGoogleChat(
+    @Body() pushNotificationGoogleChatDto: PushNotificationGoogleChatDto,
+    @Res() res,
+  ) {
+    const badRequestCode = 400;
+    try {
+      const axiosResponse =
+        await this.notificationsService.sendNotificationToGoogleChat(
+          pushNotificationGoogleChatDto,
+        );
+
+      if (axiosResponse.status === badRequestCode) {
+        throw new Error(`${axiosResponse.statusText}`);
+      }
+
+      res.status(200).send(axiosResponse.data);
+    } catch (err) {
       throw new InternalServerErrorException({
         statusCode: 500,
         message: err.message,
