@@ -43,7 +43,7 @@ export class OrdersService {
         .find({ orderStatus: status })
         .sort({ createdAt: 'desc' });
     }
-    return this.findAll();
+    return [];
   }
 
   async create(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
