@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
@@ -43,9 +44,12 @@ export class AuthController {
   @ApiBody({ type: LogoutDto })
   @ApiInternalServerErrorResponse({ description: 'logout Failed' })
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('/logout')
   async logout(@Body() logout: LogoutDto, @User() user, @Res() res) {
-    await this.userService.removeDeviceToken(user, logout.deviceToken);
+    if (logout.deviceToken) {
+      await this.userService.removeDeviceToken(user, logout.deviceToken);
+    }
     res.status(200).send();
   }
 }
