@@ -12,10 +12,10 @@ import { User } from 'src/decorators/user.decorator';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
-import { Jwt } from '../dto/jwt.dto';
 import { LogoutDto } from '../dto/logout.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../services/auth.service';
+import { LoginResponseDto } from '../dto/response/login-response.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -28,7 +28,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: 'Login' })
   @ApiUnauthorizedResponse({ description: 'Please authenticate' })
-  @ApiOkResponse({ description: 'login successfully', type: Jwt })
+  @ApiOkResponse({ description: 'login successfully', type: LoginResponseDto })
   @Post('/login')
   async login(@Req() req, @Res() res) {
     if (req.body.deviceToken) {
