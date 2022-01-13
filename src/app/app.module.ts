@@ -14,6 +14,9 @@ import { OrdersModule } from 'src/modules/orders/orders.module';
 import { NotificationsModule } from 'src/modules/notification/notifications.module';
 import { StatusModule } from 'src/modules/status/status.module';
 import { RolesModule } from 'src/modules/roles/roles.module';
+import { FreeUnitModule } from 'src/modules/free-unit/free-unit.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TaskSchedulingModule } from 'src/modules/task-scheduling/task-scheduling.module';
 
 @Module({
   imports: [
@@ -35,7 +38,10 @@ import { RolesModule } from 'src/modules/roles/roles.module';
     UsersModule,
     CategoriesModule,
     AuthModule,
+    FreeUnitModule,
     StatusModule,
+    TaskSchedulingModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],

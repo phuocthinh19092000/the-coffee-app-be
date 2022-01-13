@@ -35,6 +35,10 @@ export class UsersService {
     return order;
   }
 
+  async updateAllFreeUnit(updateUserDto: UpdateUserDto) {
+    return await this.userModel.updateMany(updateUserDto);
+  }
+
   async addDeviceToken(user: User, deviceToken: string) {
     if (!user.deviceToken.includes(deviceToken)) {
       user.deviceToken.push(deviceToken);
