@@ -1,3 +1,4 @@
+import { RolesGuard } from './../../../guards/roles.guard';
 import {
   BadRequestException,
   Body,
@@ -42,6 +43,8 @@ import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
 import { StatusService } from 'src/modules/status/services/status.service';
 import { PushNotificationGoogleChatDto } from 'src/modules/notification/dto/requests/push-notification-google-chat.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RoleType } from 'src/modules/roles/constants/role.constant';
 
 @Controller('orders')
 @ApiBearerAuth()
@@ -72,6 +75,9 @@ export class OrdersController {
   }
 
   @Get()
+  @Roles(RoleType.vendor)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     description: 'Get orders by status',
     summary: 'Get orders by status',
