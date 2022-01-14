@@ -1,4 +1,3 @@
-import { payload } from './../interface/payload-jwt.interface';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/services/users.service';
 import * as bcrypt from 'bcrypt';
@@ -17,23 +16,34 @@ export class AuthService {
   async validateUser(username: string, password: string): Promise<User> {
     const user = await this.userService.findUserByUserName(username);
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+      return user.populate({ path: 'role', select: 'name' });
     }
     return null;
   }
 
   async login(user: User) {
-    const { name, email, _id } = user;
+    const userObject = user.toObject();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { username, password, deviceToken, _id, available, ...userInfor } =
+      userObject;
+
+    return {
+      data: {
+        jwtAccessToken: this.generateAccessToken(user),
+        userInfor,
+      },
+    };
+  }
+
+  private generateAccessToken(user: User) {
+    const { name, email, _id, role } = user;
     const payload = {
       name,
       email,
       id: _id,
-      role: 'employee',
+      role: role.name,
     };
-    return { jwtAccessToken: this.generateAccessToken(payload) };
-  }
 
-  private generateAccessToken(payload: payload) {
     return this.jwtService.sign(payload, {
       secret: this.appConfigService.jwtAccessSecret,
       expiresIn: this.appConfigService.jwtAccessExpiration,
