@@ -41,6 +41,8 @@ export class OrdersService {
     if (status) {
       return await this.orderModel
         .find({ orderStatus: status })
+        .populate({ path: 'orderStatus', select: ['name'] })
+        .populate({ path: 'product', select: ['images', 'name', 'price'] })
         .sort({ createdAt: 'desc' });
     }
     return [];
