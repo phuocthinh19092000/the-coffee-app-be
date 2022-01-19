@@ -58,7 +58,8 @@ export class OrdersController {
   ) {}
 
   @Get('/user')
-  @UseGuards(JwtAuthGuard)
+  @Roles(RoleType.CUSTOMER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({
     description: 'Get orders by userId - Sort by date',
     summary: 'Get orders by userId - Sort by date',
@@ -75,7 +76,7 @@ export class OrdersController {
   }
 
   @Get()
-  @Roles(RoleType.vendor)
+  @Roles(RoleType.VENDOR)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
