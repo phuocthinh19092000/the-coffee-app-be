@@ -15,6 +15,8 @@ export class AppConfigService {
     'JWT_REFRESH_EXPIRATION',
   );
 
+  REACT_END_POINT: string = this.configService.get('REACT_END_POINT');
+
   // FIREBASE
   type: string = this.configService.get<string>('type');
   projectId: string = this.configService.get<string>('project_id');
