@@ -1,14 +1,19 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
 import {
-  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AppConfigService } from 'src/common/config/config.service';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from 'src/guards/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { OrdersService } from 'src/modules/orders/services/orders.service';
+import { OrderCreatedEvent } from 'src/modules/orders/events/order-created.event';
+import { RoleType } from 'src/modules/roles/constants/role.constant';
+import {
+  ROOM_FOR_STAFF,
+  SEND_TO_STAFF_EVENT,
+} from '../constants/event.constant';
 
 @WebSocketGateway({
   cors: {
@@ -16,25 +21,29 @@ import { OrdersService } from 'src/modules/orders/services/orders.service';
   },
 })
 @Injectable()
-@UseGuards(JwtAuthGuard)
 export class EventGateway {
-  constructor(private readonly appConfigModule: AppConfigService) {}
   @WebSocketServer() server: Server;
 
-  async sendToStaff(data: any) {
-    console.log('data sendToStaff', data);
-    this.server.sockets.to('roomForStaff2').emit('sendToStaff', data);
+  async sendToStaff(data: OrderCreatedEvent) {
+    console.log('sendToStaff event', data);
+    this.server.sockets.to(ROOM_FOR_STAFF).emit(SEND_TO_STAFF_EVENT, data);
   }
 
+  @Roles(RoleType.VENDOR)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @SubscribeMessage('joinRoomStaff')
   handleJoinRoom(client: Socket, room: string) {
-    console.log(client.id);
-    console.log(room);
-    client.join('roomForStaff2');
+    if (room === ROOM_FOR_STAFF) {
+      console.log('join room');
+      client.join(room);
+    } else throw new BadRequestException('Invalid room');
   }
 
+  @Roles(RoleType.VENDOR)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @SubscribeMessage('leaveRoomStaff')
   handleRoomLeave(client: Socket, room: string) {
-    client.leave(room);
+    if (room === ROOM_FOR_STAFF) client.leave(room);
+    else throw new BadRequestException('Invalid room');
   }
 }

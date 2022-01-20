@@ -61,14 +61,18 @@ export class OrdersService {
       userId: user._id,
       orderStatus: statusNew._id,
     });
+    await newOrder.save();
 
     const updatedUser: UpdateUserDto = {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
-
     this.usersService.updateFreeUnit(user._id, updatedUser);
-    this.eventEmitter.emit('order.created', newOrder);
-    return newOrder.save();
+    const orderInforSendToStaff = await (
+      await newOrder.populate({ path: 'orderStatus', select: ['name'] })
+    ).populate({ path: 'product', select: ['images', 'name', 'price'] });
+
+    this.eventEmitter.emit('order.created', orderInforSendToStaff);
+    return newOrder;
   }
 
   async updateStatus(order: Order, newStatus: number) {
@@ -80,7 +84,7 @@ export class OrdersService {
   async findById(id: string): Promise<Order> {
     return await this.orderModel
       .findById(id)
-      .populate({ path: 'product', select: ['price', 'name'] })
+      .populate({ path: 'product', select: ['images', 'price', 'name'] })
       .populate({ path: 'orderStatus', select: ['value', 'name'] });
   }
 }
