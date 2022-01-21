@@ -24,9 +24,12 @@ export class AuthService {
   async login(user: User) {
     const userObject = user.toObject();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { username, password, deviceToken, _id, available, ...userInfor } =
+    const { username, password, deviceToken, _id, available, ...rest } =
       userObject;
-
+    const userInfor = {
+      ...rest,
+      role: rest.role.name,
+    };
     return {
       data: {
         jwtAccessToken: this.generateAccessToken(user),
