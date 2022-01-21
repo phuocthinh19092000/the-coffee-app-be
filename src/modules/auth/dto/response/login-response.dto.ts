@@ -1,10 +1,8 @@
-import { Role } from 'src/modules/roles/entities/role.entity';
-
 export class LoginResponseDto {
   data: {
     jwtAccessToken: string;
     userInfor: {
-      role: Role;
+      role: string;
       avatarUrl: string;
       freeUnit: number;
       phoneNumber: number;
