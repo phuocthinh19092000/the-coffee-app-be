@@ -67,9 +67,11 @@ export class OrdersService {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
     this.usersService.updateFreeUnit(user._id, updatedUser);
-    const orderInforSendToStaff = await (
-      await newOrder.populate({ path: 'orderStatus', select: ['name'] })
-    ).populate({ path: 'product', select: ['images', 'name', 'price'] });
+
+    const orderInforSendToStaff = await newOrder.populate([
+      { path: 'product', select: ['images', 'price', 'name'] },
+      { path: 'orderStatus', select: ['value', 'name'] },
+    ]);
 
     this.eventEmitter.emit('order.created', orderInforSendToStaff);
     return newOrder;
