@@ -41,6 +41,17 @@ export class UsersController {
     return user;
   }
 
+  @ApiOperation({ summary: 'Get current free unit' })
+  @Get('/freeunit')
+  @ApiOkResponse({
+    description: ' Get current free unit successfully',
+    type: Number,
+  })
+  @ApiUnauthorizedResponse({ description: 'please authenticate' })
+  getFreeUnit(@User() user) {
+    return user.freeUnit;
+  }
+
   @Roles(RoleType.ADMIN, RoleType.VENDOR)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Update free unit for all users' })
@@ -53,7 +64,7 @@ export class UsersController {
       throw new BadRequestException();
     }
     const newFreeUnit = { freeUnit: freeUnit.quantity };
-    return await this.usersService.updateAllFreeUnit(newFreeUnit);
+    return this.usersService.updateAllFreeUnit(newFreeUnit);
   }
 
   @ApiOperation({ summary: 'Update webhook ' })
