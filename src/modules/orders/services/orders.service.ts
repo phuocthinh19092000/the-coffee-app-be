@@ -8,6 +8,7 @@ import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { StatusService } from 'src/modules/status/services/status.service';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OrdersService {
@@ -16,6 +17,7 @@ export class OrdersService {
     private readonly orderModel: Model<Order>,
     private readonly usersService: UsersService,
     private readonly statusService: StatusService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(): Promise<Order[]> {
@@ -59,13 +61,20 @@ export class OrdersService {
       userId: user._id,
       orderStatus: statusNew._id,
     });
+    await newOrder.save();
 
     const updatedUser: UpdateUserDto = {
       freeUnit: newFreeUnit < 0 ? 0 : newFreeUnit,
     };
-
     this.usersService.updateFreeUnit(user._id, updatedUser);
-    return newOrder.save();
+
+    const orderInforSendToStaff = await newOrder.populate([
+      { path: 'product', select: ['images', 'price', 'name'] },
+      { path: 'orderStatus', select: ['value', 'name'] },
+    ]);
+
+    this.eventEmitter.emit('order.created', orderInforSendToStaff);
+    return newOrder;
   }
 
   async updateStatus(order: Order, newStatus: number) {
@@ -77,7 +86,7 @@ export class OrdersService {
   async findById(id: string): Promise<Order> {
     return await this.orderModel
       .findById(id)
-      .populate({ path: 'product', select: ['price', 'name'] })
+      .populate({ path: 'product', select: ['images', 'price', 'name'] })
       .populate({ path: 'orderStatus', select: ['value', 'name'] });
   }
 }
