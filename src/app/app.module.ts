@@ -18,10 +18,9 @@ import { FreeUnitModule } from 'src/modules/free-unit/free-unit.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskSchedulingModule } from 'src/modules/task-scheduling/task-scheduling.module';
 import { EventModule } from 'src/modules/events/event.modules';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+
 @Module({
   imports: [
-    EventEmitterModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [AppConfigModule],
       useFactory: async (appConfigService: AppConfigService) => ({
