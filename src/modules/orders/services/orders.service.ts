@@ -43,7 +43,7 @@ export class OrdersService {
     if (status) {
       return await this.orderModel
         .find({ orderStatus: status })
-        .populate({ path: 'orderStatus', select: ['name'] })
+        .populate({ path: 'orderStatus', select: ['name', 'value'] })
         .populate({ path: 'product', select: ['images', 'name', 'price'] })
         .sort({ createdAt: 'asc' });
     }
