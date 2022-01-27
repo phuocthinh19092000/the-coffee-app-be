@@ -45,6 +45,8 @@ import { StatusService } from 'src/modules/status/services/status.service';
 import { PushNotificationGoogleChatDto } from 'src/modules/notification/dto/requests/push-notification-google-chat.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
+import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gateway';
+import { HANDLE_ORDER_EVENT } from 'src/modules/events/constants/event.constant';
 
 @Controller('orders')
 @ApiBearerAuth()
@@ -55,6 +57,7 @@ export class OrdersController {
     private readonly productsService: ProductsService,
     private readonly notificationsService: NotificationsService,
     private readonly statusService: StatusService,
+    private readonly eventGateway: OrderEventGateway,
   ) {}
 
   @Get('/user')
@@ -143,6 +146,13 @@ export class OrdersController {
         this.notificationsService.sendNotification(notification, orderData);
       }
 
+      this.eventGateway.sendToStaff(
+        {
+          order,
+        },
+        HANDLE_ORDER_EVENT,
+      );
+
       return order;
     } catch (error) {
       throw new InternalServerErrorException();
@@ -183,14 +193,16 @@ export class OrdersController {
       (currentStatus === OrderStatusNumber.new &&
         newStatus === OrderStatusNumber.canceled)
     ) {
-      const updatedOrder = this.orderService.updateStatus(order, newStatus);
+      const updatedOrder = await this.orderService.updateStatus(
+        order,
+        newStatus,
+      );
       if (user.deviceToken.length > 0) {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
           title: TitleOrder,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,
         };
-
         const orderData = {
           quantity: order.quantity.toString(),
           price: order.product.price.toString(),
@@ -201,12 +213,19 @@ export class OrdersController {
           webHook: user.webHook,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,
         };
-
         this.notificationsService.sendNotificationToGoogleChat(
           pushNotificationGoogleChatDto,
         );
         this.notificationsService.sendNotification(notification, orderData);
       }
+
+      this.eventGateway.sendToStaff(
+        {
+          order: updatedOrder,
+          newOrderStatus: nameNewStatus,
+        },
+        HANDLE_ORDER_EVENT,
+      );
 
       return updatedOrder;
     } else {

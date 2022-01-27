@@ -17,7 +17,7 @@ import { RolesModule } from 'src/modules/roles/roles.module';
 import { FreeUnitModule } from 'src/modules/free-unit/free-unit.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskSchedulingModule } from 'src/modules/task-scheduling/task-scheduling.module';
-import { EventModule } from 'src/modules/events/event.modules';
+import { OrderEventModule } from 'src/modules/events/order-event.modules';
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ import { EventModule } from 'src/modules/events/event.modules';
     FreeUnitModule,
     StatusModule,
     TaskSchedulingModule,
-    EventModule,
+    OrderEventModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
   ],
