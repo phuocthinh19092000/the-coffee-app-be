@@ -47,6 +47,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
 import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gateway';
 import { HANDLE_ORDER_EVENT } from 'src/modules/events/constants/event.constant';
+import { UsersService } from 'src/modules/users/services/users.service';
 
 @Controller('orders')
 @ApiBearerAuth()
@@ -58,6 +59,7 @@ export class OrdersController {
     private readonly notificationsService: NotificationsService,
     private readonly statusService: StatusService,
     private readonly eventGateway: OrderEventGateway,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get('/user')
@@ -178,11 +180,14 @@ export class OrdersController {
   async updateStatus(
     @Param('id') id: string,
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
-    @User() user,
   ): Promise<Order> {
-    const order = await this.orderService.findById(id);
-    const currentStatus = order.orderStatus.value;
+    const user = await this.usersService.findUserById(
+      updateStatusOrderDto.userId,
+    );
 
+    const order = await this.orderService.findById(id);
+
+    const currentStatus = order.orderStatus.value;
     const newStatus = updateStatusOrderDto.status;
     const nameNewStatus = await (
       await this.statusService.findByValue(newStatus)
@@ -197,7 +202,11 @@ export class OrdersController {
         order,
         newStatus,
       );
-      if (user.deviceToken.length > 0) {
+
+      if (
+        user.deviceToken.length > 0 &&
+        newStatus === OrderStatusNumber.ready
+      ) {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
           title: TitleOrder,
@@ -209,6 +218,11 @@ export class OrdersController {
           title: order.product.name,
           status: nameNewStatus,
         };
+
+        this.notificationsService.sendNotification(notification, orderData);
+      }
+
+      if (user.webHook && newStatus === OrderStatusNumber.ready) {
         const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
           webHook: user.webHook,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,
@@ -216,7 +230,6 @@ export class OrdersController {
         this.notificationsService.sendNotificationToGoogleChat(
           pushNotificationGoogleChatDto,
         );
-        this.notificationsService.sendNotification(notification, orderData);
       }
 
       this.eventGateway.sendToStaff(
