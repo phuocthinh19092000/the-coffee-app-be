@@ -8,7 +8,6 @@ import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { StatusService } from 'src/modules/status/services/status.service';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OrdersService {
@@ -17,7 +16,6 @@ export class OrdersService {
     private readonly orderModel: Model<Order>,
     private readonly usersService: UsersService,
     private readonly statusService: StatusService,
-    private eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(): Promise<Order[]> {
@@ -68,19 +66,17 @@ export class OrdersService {
     };
     this.usersService.updateFreeUnit(user._id, updatedUser);
 
-    const orderInforSendToStaff = await newOrder.populate([
+    return newOrder.populate([
       { path: 'product', select: ['images', 'price', 'name'] },
       { path: 'orderStatus', select: ['value', 'name'] },
     ]);
-
-    this.eventEmitter.emit('order.created', orderInforSendToStaff);
-    return newOrder;
   }
 
   async updateStatus(order: Order, newStatus: number) {
     const status = await this.statusService.findByValue(newStatus);
     order.orderStatus = status._id;
-    return order.save();
+    order.save();
+    return order.populate({ path: 'orderStatus', select: ['value', 'name'] });
   }
 
   async findById(id: string): Promise<Order> {

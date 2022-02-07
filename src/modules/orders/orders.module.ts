@@ -7,8 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
 import { StatusModule } from '../status/status.module';
 import { NotificationsModule } from '../notification/notifications.module';
-import { OrderCreatedListener } from './listeners/order-created.listener';
-import { EventModule } from '../events/event.modules';
+import { OrderEventModule } from '../events/order-event.modules';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
@@ -16,10 +15,10 @@ import { EventModule } from '../events/event.modules';
     ProductsModule,
     StatusModule,
     NotificationsModule,
-    EventModule,
+    OrderEventModule,
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, OrderCreatedListener],
+  providers: [OrdersService],
   exports: [OrdersService],
 })
 export class OrdersModule {}
