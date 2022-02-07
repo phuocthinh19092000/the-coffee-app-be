@@ -10,7 +10,7 @@ export class CreateOrderDto {
   @IsOptional()
   note: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'id of a product' })
   @IsString()
-  product: string;
+  productId: string;
 }

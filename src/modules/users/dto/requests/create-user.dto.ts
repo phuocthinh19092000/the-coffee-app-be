@@ -37,7 +37,11 @@ export class CreateUserDto {
   avatarUrl: string;
 
   @IsString()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Role of the user',
+    enum: RoleType,
+    example: [RoleType.ADMIN, RoleType.CUSTOMER, RoleType.VENDOR],
+  })
   @IsEnum(RoleType)
   roleName: string;
 }

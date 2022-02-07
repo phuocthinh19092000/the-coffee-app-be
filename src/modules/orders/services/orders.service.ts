@@ -55,6 +55,7 @@ export class OrdersService {
 
     const newOrder = new this.orderModel({
       ...createOrderDto,
+      product: createOrderDto.productId,
       quantityBilled: newFreeUnit < 0 ? -newFreeUnit : 0,
       userId: user._id,
       orderStatus: statusNew._id,
