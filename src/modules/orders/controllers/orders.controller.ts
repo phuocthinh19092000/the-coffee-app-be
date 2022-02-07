@@ -119,7 +119,9 @@ export class OrdersController {
     @Body() createOrderDto: CreateOrderDto,
     @User() user,
   ): Promise<Order> {
-    const product = await this.productsService.findById(createOrderDto.product);
+    const product = await this.productsService.findById(
+      createOrderDto.productId,
+    );
 
     if (!product) {
       throw new BadRequestException({
