@@ -179,35 +179,39 @@ export class OrdersController {
     type: String,
   })
   @UseGuards(JwtAuthGuard)
+  @Roles(RoleType.VENDOR)
   async updateStatus(
     @Param('id') id: string,
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
   ): Promise<Order> {
-    const user = await this.usersService.findUserById(
-      updateStatusOrderDto.userId,
-    );
-
     const order = await this.orderService.findById(id);
+    const user = await this.usersService.findUserById(order.userId.toString());
 
-    const currentStatus = order.orderStatus.value;
-    const newStatus = updateStatusOrderDto.status;
-    const nameNewStatus = await (
-      await this.statusService.findByValue(newStatus)
-    ).name;
+    const valueCurrentStatus = order.orderStatus.value;
+
+    const newStatus = await this.statusService.findByValue(
+      updateStatusOrderDto.status,
+    );
+    if (!newStatus) {
+      throw new BadRequestException({ description: 'Invalid status' });
+    }
+
+    const valueNewStatus = newStatus.value;
+    const nameNewStatus = newStatus.name;
 
     if (
-      newStatus === currentStatus + 1 ||
-      (currentStatus === OrderStatusNumber.new &&
-        newStatus === OrderStatusNumber.canceled)
+      valueNewStatus === valueCurrentStatus + 1 ||
+      (valueCurrentStatus === OrderStatusNumber.new &&
+        valueNewStatus === OrderStatusNumber.canceled)
     ) {
       const updatedOrder = await this.orderService.updateStatus(
         order,
-        newStatus,
+        valueNewStatus,
       );
 
       if (
         user.deviceToken.length > 0 &&
-        newStatus === OrderStatusNumber.ready
+        valueNewStatus === OrderStatusNumber.ready
       ) {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
@@ -224,7 +228,7 @@ export class OrdersController {
         this.notificationsService.sendNotification(notification, orderData);
       }
 
-      if (user.webHook && newStatus === OrderStatusNumber.ready) {
+      if (user.webHook && valueNewStatus === OrderStatusNumber.ready) {
         const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
           webHook: user.webHook,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,
