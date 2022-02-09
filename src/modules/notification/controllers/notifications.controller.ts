@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger';
 import { PushNotificationDto } from '../dto/requests/push-notification-dto.dto';
 import { PushNotificationGoogleChatDto } from '../dto/requests/push-notification-google-chat.dto';
+import { PushNotificationPickUpOrderDto } from '../dto/requests/push-notification-pickup-order.dto';
 import { NotificationsService } from '../services/notifications.service';
 
 @ApiTags('notifications')
@@ -21,20 +22,43 @@ import { NotificationsService } from '../services/notifications.service';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @ApiOperation({ summary: 'Send notification' })
+  @ApiOperation({ summary: 'Send notification to pick up order' })
+  @ApiBadRequestResponse({
+    description: 'Invalid orderId',
+  })
+  @Post('/remind-order')
+  async sendNotificationPickupOrder(
+    @Body() pushNoficationPickUpOrderDto: PushNotificationPickUpOrderDto,
+    @Res() res,
+  ) {
+    try {
+      this.notificationsService.sendNotificationRemindPickUpOrder(
+        pushNoficationPickUpOrderDto.orderId,
+      );
+      res.status(200).send();
+    } catch (err) {
+      Logger.error(err);
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: err.message,
+      });
+    }
+  }
+
+  @ApiOperation({ summary: 'Send notification by Firebase' })
   @ApiOkResponse({
-    description: 'Send notification successfully',
+    description: 'Send notification by firebase successfully',
   })
   @ApiBadRequestResponse({
     description: 'Invalid device token',
   })
-  @Post()
-  async sendNotification(
+  @Post('/firebase')
+  async sendNotificationByFirebase(
     @Body() pushNotificationDto: PushNotificationDto,
     @Res() res,
   ) {
     try {
-      const response = await this.notificationsService.sendNotification(
+      const response = await this.notificationsService.sendNotificationFirebase(
         pushNotificationDto,
       );
 
@@ -53,7 +77,7 @@ export class NotificationsController {
 
   @ApiOperation({ summary: 'Send notification to google chat' })
   @ApiOkResponse({
-    description: 'Send notification  to google chat successfully',
+    description: 'Send notification to google chat successfully',
   })
   @ApiBadRequestResponse({
     description: 'Invalid web hook link',

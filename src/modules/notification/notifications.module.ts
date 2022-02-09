@@ -1,12 +1,18 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AppConfigModule } from 'src/common/config/config.module';
-
+import { OrdersModule } from '../orders/orders.module';
+import { UsersModule } from '../users/users.module';
 import { NotificationsController } from './controllers/notifications.controller';
 import { NotificationsService } from './services/notifications.service';
 
 @Module({
-  imports: [AppConfigModule, HttpModule],
+  imports: [
+    forwardRef(() => OrdersModule),
+    AppConfigModule,
+    HttpModule,
+    UsersModule,
+  ],
   controllers: [NotificationsController],
   providers: [NotificationsService],
   exports: [NotificationsService],

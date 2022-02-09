@@ -147,7 +147,10 @@ export class OrdersController {
           status: 'new',
         };
 
-        this.notificationsService.sendNotification(notification, orderData);
+        this.notificationsService.sendNotificationFirebase(
+          notification,
+          orderData,
+        );
       }
 
       this.eventGateway.sendToStaff(
@@ -221,7 +224,10 @@ export class OrdersController {
           status: nameNewStatus,
         };
 
-        this.notificationsService.sendNotification(notification, orderData);
+        this.notificationsService.sendNotificationFirebase(
+          notification,
+          orderData,
+        );
       }
 
       if (user.webHook && newStatus === OrderStatusNumber.ready) {
