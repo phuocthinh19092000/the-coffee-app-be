@@ -16,3 +16,6 @@ export enum OrderStatusNumber {
 export const TitleOrder = 'The Coffee App OTSV';
 export const MessageNewOrder = 'Your order has been placed successfully';
 export const MessageUpdateOrder = 'Your order has been change to';
+export const MessageRemindPickUpOrder =
+  'Drinks are ready! Hurry up, time to chill!';
+

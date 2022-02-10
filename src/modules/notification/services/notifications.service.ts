@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin';
 import {
@@ -11,11 +11,20 @@ import { PushNotificationDto } from '../dto/requests/push-notification-dto.dto';
 import { PushNotificationGoogleChatDto } from '../dto/requests/push-notification-google-chat.dto';
 import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
+import {
+  MessageRemindPickUpOrder,
+  OrderStatus,
+  TitleOrder,
+} from 'src/modules/orders/constants/order.constant';
+import { OrdersService } from 'src/modules/orders/services/orders.service';
+import { UsersService } from 'src/modules/users/services/users.service';
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly appConfigService: AppConfigService,
-    private httpService: HttpService,
+    private readonly httpService: HttpService,
+    private readonly ordersService: OrdersService,
+    private readonly usersService: UsersService,
   ) {
     const serviceFirebase: ServiceAccount = {
       projectId: appConfigService.projectId,
@@ -29,7 +38,45 @@ export class NotificationsService {
     });
   }
 
-  async sendNotification(
+  async sendNotificationRemindPickUpOrder(orderId: string) {
+    const order = await this.ordersService.findById(orderId);
+    if (!order) {
+      throw new BadRequestException({ description: 'Invalid order' });
+    }
+
+    const user = await this.usersService.findUserById(order.userId.toString());
+    const webHook = user.webHook;
+    const deviceToken = user.deviceToken;
+
+    if (webHook) {
+      const pushNotificationGoogleChat = {
+        webHook: user.webHook,
+        message: MessageRemindPickUpOrder,
+      };
+
+      this.sendNotificationToGoogleChat(pushNotificationGoogleChat);
+    }
+
+    if (deviceToken) {
+      const pushNotificationByFirebase = {
+        deviceToken: user.deviceToken,
+        title: TitleOrder,
+        message: MessageRemindPickUpOrder,
+      };
+
+      const product = order.product;
+      const orderData = {
+        quantity: order.quantity.toString(),
+        price: product.price.toString(),
+        title: product.name,
+        status: OrderStatus.ready,
+      };
+
+      this.sendNotificationFirebase(pushNotificationByFirebase, orderData);
+    }
+  }
+
+  async sendNotificationFirebase(
     pushNotificationDto: PushNotificationDto,
     data?: { [key: string]: string },
   ): Promise<MessagingDevicesResponse> {
