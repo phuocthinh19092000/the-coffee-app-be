@@ -188,7 +188,7 @@ export class OrdersController {
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
-    const user = await this.usersService.findUserById(order.userId.toString());
+    const user = await this.usersService.findUserById(order.user.toString());
 
     const valueCurrentStatus = order.orderStatus.value;
 

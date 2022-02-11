@@ -44,7 +44,7 @@ export class NotificationsService {
       throw new BadRequestException({ description: 'Invalid order' });
     }
 
-    const user = await this.usersService.findUserById(order.userId.toString());
+    const user = await this.usersService.findUserById(order.user.toString());
     const webHook = user.webHook;
     const deviceToken = user.deviceToken;
 
