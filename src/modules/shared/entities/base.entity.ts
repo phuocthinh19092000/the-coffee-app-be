@@ -8,7 +8,7 @@ export class BaseEntity extends Document {
     ref: 'User',
   })
   @ApiProperty()
-  userId: mongoose.Schema.Types.ObjectId;
+  user: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
