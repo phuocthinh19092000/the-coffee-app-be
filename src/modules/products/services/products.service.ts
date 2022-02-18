@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product } from '../../products/entities/product.entity';
+import { Product } from '../entities/product.entity';
 import { Model } from 'mongoose';
 import { CreateProductDto } from '../dto/requests/create-product.dto';
 import { UpdateProductDto } from '../dto/requests/update-product.dto';
 import { Category } from '../../categories/entities/category.entity';
+import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 @Injectable()
 export class ProductsService {
   constructor(
@@ -19,15 +20,12 @@ export class ProductsService {
     const productNew = new this.productModel(createProductDto);
     category.products.push(productNew);
     productNew.category = category;
-    category.save();
+    await category.save();
     return productNew.save();
   }
 
-  async update(
-    name: string,
-    updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    return await this.productModel
+  update(name: string, updateProductDto: UpdateProductDto): Promise<Product> {
+    return this.productModel
       .findOneAndUpdate(
         { name: name },
         { $set: updateProductDto },
@@ -35,25 +33,34 @@ export class ProductsService {
       )
       .exec();
   }
-  async findAll(): Promise<Product[]> {
-    return await this.productModel.find().populate('category', 'name');
+  findAll(paginationQueryDto: PaginationQueryDto): Promise<Product[]> {
+    const { limit, offset } = paginationQueryDto;
+    return this.productModel
+      .find()
+      .populate('category', 'name')
+      .sort({ createdAt: 'desc' })
+      .skip(offset)
+      .limit(limit)
+      .exec();
   }
 
-  async findByName(name: string): Promise<Product> {
-    return await this.productModel
+  findByName(name: string): Promise<Product> {
+    return this.productModel
       .findOne({ name })
-      .populate('category', 'name');
+      .populate('category', 'name')
+      .exec();
   }
 
-  async findById(id: string): Promise<Product> {
-    return await this.productModel.findById(id);
+  findById(id: string): Promise<Product> {
+    return this.productModel.findById(id).exec();
   }
 
-  async searchByName(name: string): Promise<Product[]> {
-    return await this.productModel
+  searchByName(name: string): Promise<Product[]> {
+    return this.productModel
       .find({
         name: new RegExp(name, 'i'),
       })
-      .populate('category', 'name');
+      .populate('category', 'name')
+      .exec();
   }
 }

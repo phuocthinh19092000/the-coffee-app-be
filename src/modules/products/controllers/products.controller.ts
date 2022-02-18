@@ -18,6 +18,7 @@ import {
 import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dto/requests/create-product.dto';
 import { CategoriesService } from 'src/modules/categories/services/categories.service';
+import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -32,8 +33,8 @@ export class ProductsController {
     description: 'Get All Products successfully.',
     type: [Product],
   })
-  findAll(): Promise<Product[]> {
-    return this.productsService.findAll();
+  findAll(@Query() paginationQueryDto: PaginationQueryDto): Promise<Product[]> {
+    return this.productsService.findAll(paginationQueryDto);
   }
 
   @ApiOperation({ summary: 'Create new product' })
