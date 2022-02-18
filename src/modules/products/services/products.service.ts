@@ -6,21 +6,28 @@ import { CreateProductDto } from '../dto/requests/create-product.dto';
 import { UpdateProductDto } from '../dto/requests/update-product.dto';
 import { Category } from '../../categories/entities/category.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
+import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<Product>,
+    private readonly fileStoragesService: FileStoragesService,
   ) {}
 
   async create(
     createProductDto: CreateProductDto,
     category: Category,
+    images: Express.Multer.File,
   ): Promise<Product> {
     const productNew = new this.productModel(createProductDto);
     category.products.push(productNew);
     productNew.category = category;
-    await category.save();
+    const imageURL = await this.fileStoragesService.storeFile(images);
+    if (images) {
+      productNew.images = imageURL;
+    }
+    category.save();
     return productNew.save();
   }
 

@@ -29,4 +29,5 @@ export class AppConfigService {
   );
   clientX509: string = this.configService.get<string>('client_x509_cert_url');
   firebaseUrl: string = this.configService.get<string>('firebase_url');
+  storageBucket: string = this.configService.get<string>('storage_bucket');
 }

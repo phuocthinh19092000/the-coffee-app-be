@@ -6,6 +6,8 @@ import {
   InternalServerErrorException,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
 import {
@@ -14,11 +16,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dto/requests/create-product.dto';
 import { CategoriesService } from 'src/modules/categories/services/categories.service';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
+import { ImageFileType } from 'src/modules/shared/constants/file-types.constant';
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -38,12 +41,16 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Create new product' })
+  @UseInterceptors(FileInterceptor('images'))
   @Post()
   @ApiCreatedResponse({
     description: 'Create Product successfully.',
     type: Product,
   })
-  async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() images: Express.Multer.File,
+  ): Promise<Product> {
     const product = await this.productsService.findByName(
       createProductDto.name,
     );
@@ -63,8 +70,14 @@ export class ProductsController {
         status: 400,
       });
     }
+    if (!ImageFileType.includes(images.mimetype)) {
+      throw new BadRequestException({
+        description: 'Incorrect File Type',
+        status: 400,
+      });
+    }
     try {
-      return this.productsService.create(createProductDto, category);
+      return this.productsService.create(createProductDto, category, images);
     } catch (error) {
       throw new InternalServerErrorException();
     }
