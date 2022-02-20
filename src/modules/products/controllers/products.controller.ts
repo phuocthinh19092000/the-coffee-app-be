@@ -36,7 +36,9 @@ export class ProductsController {
     description: 'Get All Products successfully.',
     type: [Product],
   })
-  findAll(@Query() paginationQueryDto: PaginationQueryDto): Promise<Product[]> {
+  findAll(
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<{ products: Product[]; totalProduct: number }> {
     return this.productsService.findAll(paginationQueryDto);
   }
 

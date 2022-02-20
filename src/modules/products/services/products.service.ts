@@ -40,15 +40,20 @@ export class ProductsService {
       )
       .exec();
   }
-  findAll(paginationQueryDto: PaginationQueryDto): Promise<Product[]> {
+  async findAll(
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<{ products: Product[]; totalProduct: number }> {
     const { limit, offset } = paginationQueryDto;
-    return this.productModel
+    const totalProduct = await this.productModel.count();
+    const products = await this.productModel
       .find()
       .populate('category', 'name')
-      .sort({ createdAt: 'desc' })
+      .sort({ name: 'asc' })
       .skip(offset)
       .limit(limit)
       .exec();
+
+    return { products, totalProduct };
   }
 
   findByName(name: string): Promise<Product> {
