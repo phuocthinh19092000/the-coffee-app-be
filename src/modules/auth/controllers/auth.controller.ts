@@ -27,7 +27,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: 'Login' })
-  @ApiUnauthorizedResponse({ description: 'Please authenticate' })
+  @ApiUnauthorizedResponse({ description: 'Please Authenticate' })
   @ApiOkResponse({ description: 'login successfully', type: LoginResponseDto })
   @Post('/login')
   async login(@Req() req, @Res() res) {
@@ -39,9 +39,9 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Logout' })
-  @ApiOkResponse({ description: 'logout successfully' })
+  @ApiOkResponse({ description: 'Logout Successfully' })
   @ApiBody({ type: LogoutDto })
-  @ApiInternalServerErrorResponse({ description: 'logout Failed' })
+  @ApiInternalServerErrorResponse({ description: 'Logout Failed' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

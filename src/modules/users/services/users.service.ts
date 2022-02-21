@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from '../dto/requests/create-user.dto';
 import { UpdateUserDto } from '../dto/requests/update-user.dto';
 import { User } from '../entities/user.entity';
+import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -36,7 +37,7 @@ export class UsersService {
   }
 
   async updateAllFreeUnit(updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateMany(updateUserDto);
+    return this.userModel.updateMany(updateUserDto);
   }
 
   async addDeviceToken(user: User, deviceToken: string) {
@@ -56,5 +57,21 @@ export class UsersService {
   async updateWebHook(user: User, webHook: string) {
     user.webHook = webHook;
     return user.save();
+  }
+
+  async findAllUser(
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<{ user: User[]; totalUser: number }> {
+    const { limit, offset } = paginationQueryDto;
+    const totalUser = await this.userModel.count();
+    const user = await this.userModel
+      .find()
+      .populate('role', 'name')
+      .sort({ name: 'asc' })
+      .skip(offset)
+      .limit(limit)
+      .exec();
+
+    return { user, totalUser };
   }
 }
