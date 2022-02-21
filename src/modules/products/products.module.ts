@@ -4,6 +4,7 @@ import { ProductsController } from './controllers/products.controller';
 import { ProductsService } from './services/products.service';
 import { Product, ProductSchema } from './entities/product.entity';
 import { CategoriesModule } from '../categories/categories.module';
+import { FileStoragesModule } from '../file-storage/file-storage.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CategoriesModule } from '../categories/categories.module';
       },
     ]),
     CategoriesModule,
+    FileStoragesModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

@@ -32,10 +32,13 @@ export class NotificationsService {
       clientEmail: appConfigService.clientEmail,
     };
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceFirebase),
-      databaseURL: appConfigService.firebaseUrl,
-    });
+    admin.initializeApp(
+      {
+        credential: admin.credential.cert(serviceFirebase),
+        databaseURL: appConfigService.firebaseUrl,
+      },
+      'notification',
+    );
   }
 
   async sendNotificationRemindPickUpOrder(orderId: string) {
@@ -57,7 +60,7 @@ export class NotificationsService {
       this.sendNotificationToGoogleChat(pushNotificationGoogleChat);
     }
 
-    if (deviceToken) {
+    if (deviceToken.length) {
       const pushNotificationByFirebase = {
         deviceToken: user.deviceToken,
         title: TitleOrder,
@@ -71,7 +74,6 @@ export class NotificationsService {
         title: product.name,
         status: OrderStatus.ready,
       };
-
       this.sendNotificationFirebase(pushNotificationByFirebase, orderData);
     }
   }

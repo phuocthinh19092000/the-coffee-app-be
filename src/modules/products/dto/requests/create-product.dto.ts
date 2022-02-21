@@ -17,7 +17,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @ApiProperty()
-  images: string;
+  images: Express.Multer.File;
 
   @IsString()
   @ApiProperty({ description: 'Category Id Of Product' })
