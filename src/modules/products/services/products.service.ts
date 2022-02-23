@@ -31,13 +31,24 @@ export class ProductsService {
     return productNew.save();
   }
 
-  update(name: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    images: Express.Multer.File,
+  ): Promise<Product> {
+    if (images) {
+      const currentProduct = await this.findById(id);
+      const currentImageURL = currentProduct.images;
+      if (currentImageURL) {
+        const fileName = this.fileStoragesService.getFileName(currentImageURL);
+        this.fileStoragesService.deleteFile(fileName);
+      }
+      updateProductDto.images = await this.fileStoragesService.storeFile(
+        images,
+      );
+    }
     return this.productModel
-      .findOneAndUpdate(
-        { name: name },
-        { $set: updateProductDto },
-        { new: true },
-      )
+      .findOneAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
       .exec();
   }
   async findAll(
