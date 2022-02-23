@@ -18,11 +18,11 @@ export class OrdersService {
     private readonly statusService: StatusService,
   ) {}
 
-  async findAll(): Promise<Order[]> {
-    return this.orderModel.find().sort({ createdAt: 'desc' });
+  findAll(): Promise<Order[]> {
+    return this.orderModel.find().sort({ createdAt: 'desc' }).exec();
   }
 
-  async findByUserId(
+  findByUserId(
     user: User,
     paginationQueryDto: PaginationQueryDto,
   ): Promise<Order[]> {
@@ -33,25 +33,21 @@ export class OrdersService {
       .populate({ path: 'product', select: ['images', 'name', 'price'] })
       .sort({ createdAt: 'desc' })
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+      .exec();
   }
 
   async findByStatus(statusName: string): Promise<Order[]> {
     const status = await this.statusService.findByName(statusName);
+    const orders = this.orderModel
+      .find({ orderStatus: status })
+      .populate({ path: 'orderStatus', select: ['name', 'value'] })
+      .populate({ path: 'product', select: ['images', 'name', 'price'] })
+      .populate({ path: 'user', select: ['name', 'phoneNumber'] });
     if (status && statusName === OrderStatus.new) {
-      return this.orderModel
-        .find({ orderStatus: status })
-        .populate({ path: 'orderStatus', select: ['name', 'value'] })
-        .populate({ path: 'product', select: ['images', 'name', 'price'] })
-        .populate({ path: 'user', select: ['name', 'phoneNumber'] })
-        .sort({ createdAt: 'asc' });
+      return orders.sort({ updateAt: 'asc' });
     } else if (status && statusName !== OrderStatus.new) {
-      return this.orderModel
-        .find({ orderStatus: status })
-        .populate({ path: 'orderStatus', select: ['name', 'value'] })
-        .populate({ path: 'product', select: ['images', 'name', 'price'] })
-        .populate({ path: 'user', select: ['name', 'phoneNumber'] })
-        .sort({ updateAt: 'asc' });
+      return orders.sort({ updateAt: 'asc' });
     }
     return [];
   }
@@ -92,10 +88,11 @@ export class OrdersService {
     ]);
   }
 
-  async findById(id: string): Promise<Order> {
+  findById(id: string): Promise<Order> {
     return this.orderModel
       .findById(id)
       .populate({ path: 'product', select: ['images', 'price', 'name'] })
-      .populate({ path: 'orderStatus', select: ['value', 'name'] });
+      .populate({ path: 'orderStatus', select: ['value', 'name'] })
+      .exec();
   }
 }
