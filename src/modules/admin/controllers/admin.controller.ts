@@ -31,7 +31,7 @@ export class AdminController {
       throw new BadRequestException('Email already existed');
     }
 
-    const role = await this.rolesService.findByName(createUserDto.roleName);
+    const role = await this.rolesService.findByName(createUserDto.role);
 
     if (!role) {
       throw new BadRequestException('Role is not existed');

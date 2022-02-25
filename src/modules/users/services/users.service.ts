@@ -13,15 +13,14 @@ export class UsersService {
     private readonly appConfigService: AppConfigService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto, role: string): Promise<User> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { roleName, ...newUser } = createUserDto;
+  async createUser(
+    createUserDto: CreateUserDto,
+    roleId: string,
+  ): Promise<User> {
+    createUserDto.role = roleId;
+    createUserDto['password'] = this.appConfigService.password;
 
-    newUser['role'] = role;
-    newUser['password'] = this.appConfigService.password;
-
-    const user = new this.userModel(newUser);
-
+    const user = new this.userModel(createUserDto);
     return user.save();
   }
 
