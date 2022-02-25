@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsEmail, IsOptional, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+} from 'class-validator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
 import { UserStatus } from '../../constants/user.constant';
 export class CreateUserDto {
@@ -26,11 +32,14 @@ export class CreateUserDto {
     enum: RoleType,
     example: [RoleType.ADMIN, RoleType.CUSTOMER, RoleType.VENDOR],
   })
-  @IsEnum(RoleType)
-  roleName: string;
+  role: string;
 
   @IsEnum(UserStatus)
   @IsOptional()
-  @ApiProperty()
+  @ApiProperty({ enum: UserStatus })
   avaialble: string;
+
+  @IsNumber()
+  @ApiProperty()
+  freeUnit: number;
 }

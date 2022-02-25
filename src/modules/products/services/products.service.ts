@@ -59,6 +59,7 @@ export class ProductsService {
     const products = await this.productModel
       .find()
       .populate('category', 'name')
+      .collation({ locale: 'en' })
       .sort({ name: 'asc' })
       .skip(offset)
       .limit(limit)
