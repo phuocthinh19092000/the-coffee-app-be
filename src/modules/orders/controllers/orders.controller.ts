@@ -204,8 +204,8 @@ export class OrdersController {
 
     if (
       valueNewStatus === valueCurrentStatus + 1 ||
-      (valueCurrentStatus === OrderStatusNumber.new &&
-        valueNewStatus === OrderStatusNumber.canceled)
+      (valueCurrentStatus === OrderStatusNumber.NEW &&
+        valueNewStatus === OrderStatusNumber.CANCELED)
     ) {
       const updatedOrder = await this.orderService.updateStatus(
         order,
@@ -214,7 +214,7 @@ export class OrdersController {
 
       if (
         user.deviceToken.length > 0 &&
-        valueNewStatus === OrderStatusNumber.ready
+        valueNewStatus === OrderStatusNumber.READY
       ) {
         const notification: PushNotificationDto = {
           deviceToken: user.deviceToken,
@@ -234,7 +234,7 @@ export class OrdersController {
         );
       }
 
-      if (user.webHook && valueNewStatus === OrderStatusNumber.ready) {
+      if (user.webHook && valueNewStatus === OrderStatusNumber.READY) {
         const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
           webHook: user.webHook,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,

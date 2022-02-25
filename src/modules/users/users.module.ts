@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AppConfigModule } from 'src/common/config/config.module';
 import { FreeUnitModule } from '../free-unit/free-unit.module';
 import { RolesModule } from '../roles/roles.module';
 import { UsersController } from './controllers/users.controller';
@@ -16,6 +17,7 @@ import { UsersService } from './services/users.service';
     ]),
     RolesModule,
     FreeUnitModule,
+    AppConfigModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

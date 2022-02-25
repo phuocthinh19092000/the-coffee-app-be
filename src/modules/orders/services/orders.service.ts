@@ -44,9 +44,9 @@ export class OrdersService {
       .populate({ path: 'orderStatus', select: ['name', 'value'] })
       .populate({ path: 'product', select: ['images', 'name', 'price'] })
       .populate({ path: 'user', select: ['name', 'phoneNumber'] });
-    if (status && statusName === OrderStatus.new) {
+    if (status && statusName === OrderStatus.NEW) {
       return orders.sort({ updateAt: 'asc' });
-    } else if (status && statusName !== OrderStatus.new) {
+    } else if (status && statusName !== OrderStatus.NEW) {
       return orders.sort({ updateAt: 'asc' });
     }
     return [];

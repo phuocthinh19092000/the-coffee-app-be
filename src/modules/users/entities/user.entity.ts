@@ -10,17 +10,6 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User extends Document {
-  @ApiProperty()
-  @Prop({ required: true, unique: true })
-  username: string;
-
-  @ApiProperty()
-  @Prop({ required: true, private: true })
-  password: string;
-
-  @Prop()
-  name: string;
-
   @Prop({
     required: true,
     unique: true,
@@ -31,6 +20,13 @@ export class User extends Document {
   })
   email: string;
 
+  @ApiProperty()
+  @Prop({ required: true, private: true })
+  password: string;
+
+  @Prop()
+  name: string;
+
   @Prop()
   phoneNumber: string;
 
@@ -38,10 +34,10 @@ export class User extends Document {
   @Prop({ required: true, default: 3 })
   freeUnit: number;
 
-  @Prop()
+  @Prop({ default: '' })
   avatarUrl: string;
 
-  @Prop({ required: true, default: UserStatus.active })
+  @Prop({ required: true, default: UserStatus.ACTIVE })
   available: UserStatus;
 
   @Prop()
@@ -67,7 +63,6 @@ UserSchema.method('toJSON', function () {
 
   delete userObject.password;
   delete userObject._id;
-  delete userObject.username;
   delete userObject.__v;
   delete userObject.deviceToken;
   delete userObject.webHook;

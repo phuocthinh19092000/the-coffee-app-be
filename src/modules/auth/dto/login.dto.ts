@@ -3,7 +3,7 @@ import { IsString, MaxLength, MinLength } from 'class-validator';
 export class LoginDto {
   @ApiProperty()
   @IsString()
-  username: string;
+  email: string;
 
   @ApiProperty()
   @IsString()

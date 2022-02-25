@@ -5,22 +5,28 @@ import { CreateUserDto } from '../dto/requests/create-user.dto';
 import { UpdateUserDto } from '../dto/requests/update-user.dto';
 import { User } from '../entities/user.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
+import { AppConfigService } from 'src/common/config/config.service';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    private readonly appConfigService: AppConfigService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto, role: string): Promise<User> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { roleName, ...newUser } = createUserDto;
+
     newUser['role'] = role;
+    newUser['password'] = this.appConfigService.password;
+
     const user = new this.userModel(newUser);
+
     return user.save();
   }
 
-  async findUserByUserName(username: string): Promise<User | undefined> {
-    return this.userModel.findOne({ username });
+  findUserByEmail(email: string): Promise<User | undefined> {
+    return this.userModel.findOne({ email }).exec();
   }
 
   async findUserById(_id: string): Promise<User | undefined> {
