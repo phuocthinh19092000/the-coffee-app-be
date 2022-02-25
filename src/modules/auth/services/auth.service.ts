@@ -13,8 +13,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User> {
-    const user = await this.userService.findUserByUserName(username);
+  async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.userService.findUserByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       return user.populate({ path: 'role', select: 'name' });
     }
@@ -24,7 +24,7 @@ export class AuthService {
   async login(user: User) {
     const userObject = user.toObject();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { username, password, deviceToken, _id, available, ...rest } =
+    const { email, password, deviceToken, _id, available, ...rest } =
       userObject;
     const userInfor = {
       ...rest,
@@ -39,10 +39,9 @@ export class AuthService {
   }
 
   private generateAccessToken(user: User) {
-    const { name, email, _id, role } = user;
+    const { name, _id, role } = user;
     const payload = {
       name,
-      email,
       id: _id,
       role: role.name,
     };

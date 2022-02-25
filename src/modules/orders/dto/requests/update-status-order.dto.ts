@@ -8,10 +8,10 @@ export class UpdateStatusOrderDto {
     description: 'Order status number',
     enum: OrderStatusNumber,
     example: [
-      OrderStatusNumber.new,
-      OrderStatusNumber.processing,
-      OrderStatusNumber.ready,
-      OrderStatusNumber.canceled,
+      OrderStatusNumber.NEW,
+      OrderStatusNumber.PROCESSING,
+      OrderStatusNumber.READY,
+      OrderStatusNumber.CANCELED,
     ],
   })
   @IsNumber()

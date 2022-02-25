@@ -72,7 +72,7 @@ export class NotificationsService {
         quantity: order.quantity.toString(),
         price: product.price.toString(),
         title: product.name,
-        status: OrderStatus.ready,
+        status: OrderStatus.READY,
       };
       this.sendNotificationFirebase(pushNotificationByFirebase, orderData);
     }

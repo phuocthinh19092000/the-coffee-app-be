@@ -22,21 +22,19 @@ export class AdminController {
     description: 'create new account successfully',
     type: User,
   })
-  @ApiBadRequestResponse({ description: 'username already existed' })
+  @ApiBadRequestResponse({ description: 'Email already existed' })
   @Post()
   async createAccount(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.userService.findUserByUserName(
-      createUserDto.username,
-    );
+    const user = await this.userService.findUserByEmail(createUserDto.email);
 
     if (user) {
-      throw new BadRequestException('username already existed');
+      throw new BadRequestException('Email already existed');
     }
 
     const role = await this.rolesService.findByName(createUserDto.roleName);
 
     if (!role) {
-      throw new BadRequestException('role is not existed');
+      throw new BadRequestException('Role is not existed');
     }
 
     return this.userService.createUser(createUserDto, role._id);
