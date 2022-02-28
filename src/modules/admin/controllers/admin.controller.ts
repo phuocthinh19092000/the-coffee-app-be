@@ -1,15 +1,27 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { RoleType } from 'src/modules/roles/constants/role.constant';
 import { RolesService } from 'src/modules/roles/services/roles.service';
 
 import { CreateUserDto } from 'src/modules/users/dto/requests/create-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { UsersService } from 'src/modules/users/services/users.service';
+
+@UseGuards(JwtAuthGuard)
 @ApiTags('admin/account')
 @Controller('admin/account')
 export class AdminController {
@@ -17,6 +29,9 @@ export class AdminController {
     private readonly userService: UsersService,
     private readonly rolesService: RolesService,
   ) {}
+
+  @Roles(RoleType.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Create new account' })
   @ApiCreatedResponse({
     description: 'create new account successfully',

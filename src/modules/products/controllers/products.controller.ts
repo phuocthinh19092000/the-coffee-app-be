@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
@@ -28,13 +29,16 @@ import { ImageFileType } from 'src/modules/shared/constants/file-types.constant'
 import { UpdateProductDto } from '../dto/requests/update-product.dto';
 import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
 import { RegexDownloadURL } from 'src/modules/file-storage/constants/regex.constant';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RoleType } from 'src/modules/roles/constants/role.constant';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly categoriesService: CategoriesService,
-    private readonly fileStoragesService: FileStoragesService,
   ) {}
 
   @ApiOperation({ summary: 'Get All Products' })
@@ -49,6 +53,8 @@ export class ProductsController {
     return this.productsService.findAll(paginationQueryDto);
   }
 
+  @Roles(RoleType.VENDOR)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create new product' })
   @UseInterceptors(FileInterceptor('images'))
   @Post()
@@ -91,6 +97,8 @@ export class ProductsController {
     }
   }
 
+  @Roles(RoleType.VENDOR)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update product' })
   @UseInterceptors(FileInterceptor('images'))
   @Patch(':id')
