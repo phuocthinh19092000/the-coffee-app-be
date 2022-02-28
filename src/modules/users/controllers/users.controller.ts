@@ -70,7 +70,7 @@ export class UsersController {
     return user.freeUnit;
   }
 
-  @Roles(RoleType.ADMIN, RoleType.VENDOR)
+  @Roles(RoleType.ADMIN)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Update free unit for all users' })
   @Patch('/freeunit')

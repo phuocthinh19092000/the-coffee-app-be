@@ -49,6 +49,7 @@ import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gatew
 import { HANDLE_ORDER_EVENT } from 'src/modules/events/constants/event.constant';
 import { UsersService } from 'src/modules/users/services/users.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('orders')
 @ApiBearerAuth()
 @ApiTags('orders')
@@ -64,7 +65,7 @@ export class OrdersController {
 
   @Get('/user')
   @Roles(RoleType.CUSTOMER)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @ApiOperation({
     description: 'Get orders by userId - Sort by date',
     summary: 'Get orders by userId - Sort by date',
@@ -82,7 +83,7 @@ export class OrdersController {
 
   @Get()
   @Roles(RoleType.VENDOR)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({
     description: 'Get orders by status',
@@ -106,7 +107,6 @@ export class OrdersController {
     summary: 'Create new order',
   })
   @Post()
-  @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({
     description: 'Create Order successfully',
     type: CreateOrderDto,
