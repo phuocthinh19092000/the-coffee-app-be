@@ -17,8 +17,9 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
-  @ApiProperty()
   @IsString()
+  @IsOptional()
+  @ApiPropertyOptional()
   phoneNumber: string;
 
   @IsString()
