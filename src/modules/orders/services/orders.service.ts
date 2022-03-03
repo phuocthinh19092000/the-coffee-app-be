@@ -39,8 +39,14 @@ export class OrdersService {
 
   async findByStatus(statusName: string): Promise<Order[]> {
     const status = await this.statusService.findByName(statusName);
+
+    const startDay = new Date();
+    startDay.setHours(0, 0, 0, 0);
+    const endDay = new Date();
+    endDay.setHours(23, 59, 59, 999);
+
     const orders = this.orderModel
-      .find({ orderStatus: status })
+      .find({ orderStatus: status, createdAt: { $gte: startDay, $lt: endDay } })
       .populate({ path: 'orderStatus', select: ['name', 'value'] })
       .populate({ path: 'product', select: ['images', 'name', 'price'] })
       .populate({ path: 'user', select: ['name', 'phoneNumber'] });

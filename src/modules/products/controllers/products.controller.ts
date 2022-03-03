@@ -27,7 +27,6 @@ import { CategoriesService } from 'src/modules/categories/services/categories.se
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { ImageFileType } from 'src/modules/shared/constants/file-types.constant';
 import { UpdateProductDto } from '../dto/requests/update-product.dto';
-import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
 import { RegexDownloadURL } from 'src/modules/file-storage/constants/regex.constant';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
