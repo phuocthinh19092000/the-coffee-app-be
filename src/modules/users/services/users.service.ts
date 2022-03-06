@@ -6,6 +6,7 @@ import { UpdateUserDto } from '../dto/requests/update-user.dto';
 import { User } from '../entities/user.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { AppConfigService } from 'src/common/config/config.service';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -33,12 +34,11 @@ export class UsersService {
   }
 
   async updateFreeUnit(id: string, updateUserDto: UpdateUserDto) {
-    const order = await this.userModel.findByIdAndUpdate(
+    return this.userModel.findByIdAndUpdate(
       { _id: id },
       { $set: updateUserDto },
       { new: true },
     );
-    return order;
   }
 
   async updateAllFreeUnit(updateUserDto: UpdateUserDto) {
@@ -61,6 +61,11 @@ export class UsersService {
 
   async updateWebHook(user: User, webHook: string) {
     user.webHook = webHook;
+    return user.save();
+  }
+
+  async changePassword(user: User, newPassword: string) {
+    user.password = newPassword;
     return user.save();
   }
 

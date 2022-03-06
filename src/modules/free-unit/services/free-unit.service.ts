@@ -11,7 +11,7 @@ export class FreeUnitService {
     private readonly FreeUnitModel: Model<FreeUnit>,
   ) {}
   async get(): Promise<FreeUnit> {
-    return await this.FreeUnitModel.findOne();
+    return this.FreeUnitModel.findOne();
   }
 
   async add(freeUnitDto: FreeUnitDto): Promise<FreeUnit> {
