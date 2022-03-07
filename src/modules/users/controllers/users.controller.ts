@@ -5,6 +5,7 @@ import {
   Get,
   Patch,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,6 +26,8 @@ import { UpdateWebhookDto } from '../dto/requests/update-webhook.dto';
 import { UserInforDto } from '../dto/respone/user-infor.dto';
 import { UsersService } from '../services/users.service';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
+import { ChangePasswordDto } from '../dto/requests/change-password.dto';
+import * as bcrypt from 'bcrypt';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('users')
@@ -83,6 +86,35 @@ export class UsersController {
     }
     const newFreeUnit = { freeUnit: freeUnit.quantity };
     return this.usersService.updateAllFreeUnit(newFreeUnit);
+  }
+
+  @ApiOperation({ summary: 'Change Password for User' })
+  @Patch('/change-password')
+  @ApiOkResponse({
+    description: ' Change Password successfully',
+  })
+  @ApiUnauthorizedResponse({ description: 'Please Authenticate' })
+  async changePasswordUser(
+    @User() user,
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Res() res,
+  ) {
+    if (changePasswordDto.currentPassword === changePasswordDto.newPassword) {
+      throw new BadRequestException(
+        'New Password must different with old password!',
+      );
+    }
+    if (
+      await bcrypt.compare(changePasswordDto.currentPassword, user.password)
+    ) {
+      await this.usersService.changePassword(
+        user,
+        changePasswordDto.newPassword,
+      );
+      res.status(200).send('Change Password successfully!');
+    } else {
+      throw new BadRequestException('Current password does not match!');
+    }
   }
 
   @ApiOperation({ summary: 'Update webhook ' })
