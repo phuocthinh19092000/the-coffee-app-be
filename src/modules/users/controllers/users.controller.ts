@@ -127,4 +127,17 @@ export class UsersController {
   updateWebHook(@User() user, @Body() updateWebHookDto: UpdateWebhookDto) {
     return this.usersService.updateWebHook(user, updateWebHookDto.webHook);
   }
+
+  @ApiOperation({ summary: 'Get webhook ' })
+  @ApiOkResponse({
+    description: 'Get webhook successfully',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Please Authenticate',
+  })
+  @Get('/webhook')
+  getWebhook(@User() user) {
+    return user.webHook;
+  }
 }
