@@ -1,4 +1,4 @@
-import { RolesGuard } from './../../../guards/roles.guard';
+import { RolesGuard } from '../../../guards/roles.guard';
 import {
   BadRequestException,
   Body,
@@ -147,13 +147,13 @@ export class OrdersController {
           status: 'new',
         };
 
-        this.notificationsService.sendNotificationFirebase(
+        await this.notificationsService.sendNotificationFirebase(
           notification,
           orderData,
         );
       }
 
-      this.eventGateway.sendToStaff(
+      await this.eventGateway.sendToStaff(
         {
           order,
         },
@@ -228,7 +228,7 @@ export class OrdersController {
           status: nameNewStatus,
         };
 
-        this.notificationsService.sendNotificationFirebase(
+        await this.notificationsService.sendNotificationFirebase(
           notification,
           orderData,
         );
@@ -239,12 +239,12 @@ export class OrdersController {
           webHook: user.webHook,
           message: `${MessageUpdateOrder} ${nameNewStatus}`,
         };
-        this.notificationsService.sendNotificationToGoogleChat(
+        await this.notificationsService.sendNotificationToGoogleChat(
           pushNotificationGoogleChatDto,
         );
       }
 
-      this.eventGateway.sendToStaff(
+      await this.eventGateway.sendToStaff(
         {
           order: updatedOrder,
           newOrderStatus: nameNewStatus,
