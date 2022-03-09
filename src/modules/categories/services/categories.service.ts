@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from 'src/modules/products/entities/product.entity';
+import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
 import { UpdateCategoryDto } from '../dto/request/update-category.dto';
 import { Category } from '../entities/category.entity';
-
 @Injectable()
 export class CategoriesService {
   constructor(
@@ -13,7 +13,20 @@ export class CategoriesService {
     private readonly categoryModel: Model<Category>,
   ) {}
 
-  async findAll(): Promise<Category[]> {
+  async findAll(
+    paginationQueryDto?: PaginationQueryDto,
+  ): Promise<Category[] | { categories: Category[]; totalCategories: number }> {
+    if (Object.keys(paginationQueryDto).length) {
+      const totalCategories = await this.categoryModel.count();
+      const { limit, offset } = paginationQueryDto;
+      const categories = await this.categoryModel
+        .find()
+        .sort({ name: 'asc' })
+        .collation({ locale: 'en' })
+        .skip(offset)
+        .limit(limit);
+      return { categories, totalCategories };
+    }
     return this.categoryModel.find().sort({ name: 0 });
   }
 

@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../entities/category.entity';
@@ -20,6 +21,7 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
 @ApiTags('categories')
 @Controller('categories')
 export class CategoriesController {
@@ -31,8 +33,10 @@ export class CategoriesController {
     description: 'Get All Categories successfully.',
     type: [Category],
   })
-  findAll(): Promise<Category[]> {
-    return this.categoriesService.findAll();
+  findAll(
+    @Query() paginationQueryDto?: PaginationQueryDto,
+  ): Promise<Category[] | { categories: Category[]; totalCategories: number }> {
+    return this.categoriesService.findAll(paginationQueryDto);
   }
 
   @ApiOperation({ summary: 'Get Category By Id' })
