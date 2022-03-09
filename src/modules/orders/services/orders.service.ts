@@ -8,7 +8,10 @@ import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { StatusService } from 'src/modules/status/services/status.service';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
-import { OrderStatus } from 'src/modules/orders/constants/order.constant';
+import {
+  OrderStatus,
+  OrderStatusNumber,
+} from 'src/modules/orders/constants/order.constant';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -84,9 +87,12 @@ export class OrdersService {
     ]);
   }
 
-  async updateStatus(order: Order, newStatus: number) {
+  async updateStatus(order: Order, newStatus: number, reason?: string) {
     const status = await this.statusService.findByValue(newStatus);
     order.orderStatus = status._id;
+    if (newStatus === OrderStatusNumber.CANCELED) {
+      order.reason = reason;
+    }
     await order.save();
     return order.populate([
       { path: 'orderStatus', select: ['value', 'name'] },

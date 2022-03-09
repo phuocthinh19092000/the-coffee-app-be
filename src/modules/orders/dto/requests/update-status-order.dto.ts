@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { OrderStatusNumber } from '../../constants/order.constant';
 
 export class UpdateStatusOrderDto {
@@ -14,6 +14,10 @@ export class UpdateStatusOrderDto {
       OrderStatusNumber.CANCELED,
     ],
   })
-  @IsNumber()
   status: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  reason: string;
 }
