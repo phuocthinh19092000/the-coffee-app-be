@@ -6,8 +6,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import toJson from 'src/database/plugins/toJson';
 import { Status } from 'src/modules/status/entities/status.entity';
 
-export type OrderDocument = Order & Document;
-
 @Schema({
   timestamps: true,
 })
@@ -39,6 +37,10 @@ export class Order extends BaseEntity {
   })
   @ApiProperty()
   product: Product;
+
+  @Prop()
+  @ApiProperty()
+  reason: string;
 
   @Prop({
     type: mongoose.Schema.Types.Date,

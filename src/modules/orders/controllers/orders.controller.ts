@@ -201,15 +201,26 @@ export class OrdersController {
 
     const valueNewStatus = newStatus.value;
     const nameNewStatus = newStatus.name;
-
-    if (
+    const checkCorrectStatus =
       valueNewStatus === valueCurrentStatus + 1 ||
-      (valueCurrentStatus === OrderStatusNumber.NEW &&
-        valueNewStatus === OrderStatusNumber.CANCELED)
-    ) {
+      ((valueCurrentStatus === OrderStatusNumber.NEW ||
+        valueCurrentStatus === OrderStatusNumber.PROCESSING) &&
+        valueNewStatus === OrderStatusNumber.CANCELED);
+
+    if (checkCorrectStatus) {
+      if (
+        valueNewStatus === OrderStatusNumber.CANCELED &&
+        !updateStatusOrderDto.reason
+      ) {
+        throw new BadRequestException({
+          description: 'Please fill the reason',
+          status: 400,
+        });
+      }
       const updatedOrder = await this.orderService.updateStatus(
         order,
         valueNewStatus,
+        updateStatusOrderDto.reason,
       );
 
       if (

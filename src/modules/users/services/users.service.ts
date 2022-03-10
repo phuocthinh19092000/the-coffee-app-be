@@ -61,7 +61,8 @@ export class UsersService {
 
   async updateWebHook(user: User, webHook: string) {
     user.webHook = webHook;
-    return user.save();
+    await user.save();
+    return user.webHook;
   }
 
   async changePassword(user: User, newPassword: string) {

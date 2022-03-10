@@ -12,19 +12,19 @@ export class StatusService {
   ) {}
 
   async findAll(): Promise<Status[]> {
-    return await this.statusModel.find();
+    return this.statusModel.find();
   }
 
   async findByName(statusName: string): Promise<Status> {
-    return await this.statusModel.findOne({ name: statusName });
+    return this.statusModel.findOne({ name: statusName });
   }
 
   async findByValue(statusValue: number): Promise<Status> {
-    return await this.statusModel.findOne({ value: statusValue });
+    return this.statusModel.findOne({ value: statusValue });
   }
 
   async findById(id: string): Promise<Status> {
-    return await this.statusModel.findById(id);
+    return this.statusModel.findById(id);
   }
 
   async createStatus(createStatusDto: CreateStatusDto): Promise<Status> {

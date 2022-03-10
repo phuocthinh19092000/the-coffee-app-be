@@ -57,7 +57,7 @@ export class NotificationsService {
         message: MessageRemindPickUpOrder,
       };
 
-      this.sendNotificationToGoogleChat(pushNotificationGoogleChat);
+      await this.sendNotificationToGoogleChat(pushNotificationGoogleChat);
     }
 
     if (deviceToken.length) {
@@ -74,7 +74,10 @@ export class NotificationsService {
         title: product.name,
         status: OrderStatus.READY,
       };
-      this.sendNotificationFirebase(pushNotificationByFirebase, orderData);
+      await this.sendNotificationFirebase(
+        pushNotificationByFirebase,
+        orderData,
+      );
     }
   }
 
