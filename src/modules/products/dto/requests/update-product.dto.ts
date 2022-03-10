@@ -8,4 +8,8 @@ export class UpdateProductDto extends OmitType(CreateProductDto, [
   @IsOptional()
   @ApiHideProperty()
   images: string;
+
+  @IsOptional()
+  @ApiHideProperty()
+  status: string;
 }

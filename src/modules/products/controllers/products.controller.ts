@@ -75,7 +75,7 @@ export class ProductsController {
       });
     }
     const category = await this.categoriesService.findOne(
-      createProductDto.categoryId,
+      createProductDto.category,
     );
     if (!category) {
       throw new BadRequestException({
@@ -83,6 +83,7 @@ export class ProductsController {
         status: 400,
       });
     }
+
     if (!ImageFileType.includes(images?.mimetype)) {
       throw new BadRequestException({
         description: 'Incorrect File Type',
@@ -134,7 +135,7 @@ export class ProductsController {
       });
     }
     const category = await this.categoriesService.findOne(
-      updateProductDto.categoryId,
+      updateProductDto.category,
     );
     if (!category) {
       throw new BadRequestException({
