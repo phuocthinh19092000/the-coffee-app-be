@@ -38,14 +38,14 @@ export class Order extends BaseEntity {
   @ApiProperty()
   product: Product;
 
-  @Prop()
-  @ApiProperty()
-  reason: string;
-
   @Prop({
     type: mongoose.Schema.Types.Date,
   })
   createdAt: Date;
+
+  @Prop({ default: '' })
+  @ApiProperty()
+  reason: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
