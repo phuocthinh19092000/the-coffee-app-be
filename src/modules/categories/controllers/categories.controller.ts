@@ -107,10 +107,22 @@ export class CategoriesController {
     description: 'id of category',
     type: String,
   })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    return this.categoriesService.update(id, updateCategoryDto);
+    const category = await this.categoriesService.findByName(
+      updateCategoryDto.name,
+    );
+    if (category)
+      throw new BadRequestException({
+        description: 'Category name already existed',
+        status: 400,
+      });
+    try {
+      return this.categoriesService.update(id, updateCategoryDto);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -6,6 +6,7 @@ import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto'
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
 import { UpdateCategoryDto } from '../dto/request/update-category.dto';
 import { Category } from '../entities/category.entity';
+
 @Injectable()
 export class CategoriesService {
   constructor(
@@ -52,13 +53,11 @@ export class CategoriesService {
     id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    const category = await this.categoryModel
+    return await this.categoryModel
       .findOneAndUpdate({ _id: id }, { $set: updateCategoryDto }, { new: true })
       .exec();
-
-    return category;
   }
   async findByName(name: string): Promise<Category> {
-    return await this.categoryModel.findOne({ name });
+    return this.categoryModel.findOne({ name });
   }
 }
