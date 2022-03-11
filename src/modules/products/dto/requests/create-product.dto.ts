@@ -21,5 +21,5 @@ export class CreateProductDto {
 
   @IsString()
   @ApiProperty({ description: 'Category Id Of Product' })
-  categoryId: string;
+  category: string;
 }
