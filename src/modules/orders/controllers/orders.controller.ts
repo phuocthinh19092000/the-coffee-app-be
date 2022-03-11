@@ -67,8 +67,6 @@ export class OrdersController {
   ) {}
 
   @Get('/user')
-  @Roles(RoleType.CUSTOMER)
-  @UseGuards(RolesGuard)
   @ApiOperation({
     description: 'Get orders by userId - Sort by date',
     summary: 'Get orders by userId - Sort by date',
@@ -148,6 +146,7 @@ export class OrdersController {
           price: product.price.toString(),
           title: product.name,
           status: 'new',
+          image: product.images,
         };
 
         await this.notificationsService.sendNotificationFirebase(
@@ -243,6 +242,7 @@ export class OrdersController {
           quantity: order.quantity.toString(),
           price: order.product.price.toString(),
           title: order.product.name,
+          image: order.product.images,
           status: nameNewStatus,
         };
 
