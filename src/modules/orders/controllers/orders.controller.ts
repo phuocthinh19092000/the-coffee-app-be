@@ -51,6 +51,7 @@ import {
   ORDER_CANCELED,
 } from 'src/modules/events/constants/event.constant';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { ProductStatus } from 'src/modules/products/constants/product.constant';
 
 @UseGuards(JwtAuthGuard)
 @Controller('orders')
@@ -131,6 +132,13 @@ export class OrdersController {
       });
     }
 
+    if (product.status === ProductStatus.outOfStock) {
+      throw new BadRequestException({
+        description:
+          'Thanks for your order! Unfortunately, the drink from your order are out of stock',
+        status: 400,
+      });
+    }
     try {
       const order = await this.orderService.create(createOrderDto, user);
 
