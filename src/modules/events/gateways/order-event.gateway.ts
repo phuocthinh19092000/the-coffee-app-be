@@ -31,6 +31,7 @@ export class OrderEventGateway {
     data: {
       order: OrderCreatedEvent;
       newOrderStatus?: string;
+      currentOrderStatus?: string;
     },
     event: string,
   ) {
