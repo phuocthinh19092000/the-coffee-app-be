@@ -191,10 +191,14 @@ export class OrdersController {
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
+    if (!order) {
+      throw new BadRequestException({ description: 'Order not exist' });
+    }
+
     const user = await this.usersService.findUserById(order.user.toString());
 
     const valueCurrentStatus = order.orderStatus.value;
-
+    const nameCurrentStatus = order.orderStatus.name;
     const newStatus = await this.statusService.findByValue(
       updateStatusOrderDto.status,
     );
@@ -262,6 +266,7 @@ export class OrdersController {
         {
           order: updatedOrder,
           newOrderStatus: nameNewStatus,
+          currentOrderStatus: nameCurrentStatus,
         },
         HANDLE_ORDER_EVENT,
       );
