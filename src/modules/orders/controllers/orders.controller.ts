@@ -46,7 +46,10 @@ import { PushNotificationGoogleChatDto } from 'src/modules/notification/dto/requ
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
 import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gateway';
-import { HANDLE_ORDER_EVENT } from 'src/modules/events/constants/event.constant';
+import {
+  HANDLE_ORDER_EVENT,
+  ORDER_CANCELED,
+} from 'src/modules/events/constants/event.constant';
 import { UsersService } from 'src/modules/users/services/users.service';
 
 @UseGuards(JwtAuthGuard)
@@ -262,6 +265,14 @@ export class OrdersController {
         },
         HANDLE_ORDER_EVENT,
       );
+
+      if (valueNewStatus === OrderStatusNumber.CANCELED) {
+        await this.eventGateway.sendToCustomer(
+          updatedOrder,
+          user._id,
+          ORDER_CANCELED,
+        );
+      }
 
       return updatedOrder;
     } else {
