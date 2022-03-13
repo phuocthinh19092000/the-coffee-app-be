@@ -31,9 +31,6 @@ export class AuthController {
   @ApiOkResponse({ description: 'login successfully', type: LoginResponseDto })
   @Post('/login')
   async login(@Req() req, @Res() res) {
-    if (req.body.deviceToken) {
-      await this.userService.addDeviceToken(req.user, req.body.deviceToken);
-    }
     const jwt = await this.authService.login(req.user);
     res.status(200).send(jwt);
   }

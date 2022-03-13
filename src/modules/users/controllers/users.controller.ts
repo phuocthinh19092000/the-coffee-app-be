@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Patch,
+  Post,
   Query,
   Res,
   UseGuards,
@@ -28,6 +29,7 @@ import { UsersService } from '../services/users.service';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { ChangePasswordDto } from '../dto/requests/change-password.dto';
 import * as bcrypt from 'bcrypt';
+import { AddDeviceTokenDto } from '../dto/requests/add-device-token.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('users')
@@ -139,5 +141,18 @@ export class UsersController {
   @Get('/webhook')
   getWebhook(@User() user) {
     return user.webHook;
+  }
+
+  @ApiOperation({ summary: 'Add device token for user' })
+  @ApiOkResponse({
+    description: 'Add device token for user successfully',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Please Authenticate',
+  })
+  @Post('/deviceToken')
+  addDeviceToken(@User() user, @Body() deviceTokenDto: AddDeviceTokenDto) {
+    return this.usersService.addDeviceToken(user, deviceTokenDto.deviceToken);
   }
 }
