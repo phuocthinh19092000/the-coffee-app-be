@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ProductStatus } from 'src/modules/products/constants/product.constant';
 import { Product } from 'src/modules/products/entities/product.entity';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
 import { CreateCategoryDto } from '../dto/request/create-category.dto';
@@ -41,7 +42,11 @@ export class CategoriesService {
       options: { sort: { name: 1 } },
     });
 
-    return category.products;
+    const listProducts = category.products.filter(
+      (product) => product.status === ProductStatus.inStock,
+    );
+
+    return listProducts;
   }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
