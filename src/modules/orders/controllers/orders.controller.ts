@@ -285,6 +285,12 @@ export class OrdersController {
           user._id,
           ORDER_CANCELED,
         );
+
+        const oldFreeUnit = user.freeUnit + order.quantity;
+
+        await this.usersService.updateFreeUnit(user._id, {
+          freeUnit: oldFreeUnit,
+        });
       }
 
       return updatedOrder;
