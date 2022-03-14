@@ -49,7 +49,8 @@ export class UsersService {
     if (!user.deviceToken.includes(deviceToken)) {
       user.deviceToken.push(deviceToken);
     }
-    return user.save();
+    await user.save();
+    return user.deviceToken;
   }
 
   async removeDeviceToken(user: User, deviceToken: string) {
