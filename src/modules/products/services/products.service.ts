@@ -7,6 +7,7 @@ import { UpdateProductDto } from '../dto/requests/update-product.dto';
 import { Category } from '../../categories/entities/category.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
+import { ProductStatus } from '../constants/product.constant';
 @Injectable()
 export class ProductsService {
   constructor(
@@ -83,6 +84,7 @@ export class ProductsService {
     return this.productModel
       .find({
         name: new RegExp(name, 'i'),
+        status: ProductStatus.inStock,
       })
       .populate('category', 'name')
       .exec();
