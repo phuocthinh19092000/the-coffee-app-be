@@ -8,12 +8,14 @@ import { Category } from '../../categories/entities/category.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
 import { ProductStatus } from '../constants/product.constant';
+import { CategoriesService } from 'src/modules/categories/services/categories.service';
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<Product>,
     private readonly fileStoragesService: FileStoragesService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async create(
@@ -36,9 +38,10 @@ export class ProductsService {
     id: string,
     updateProductDto: UpdateProductDto,
     images: Express.Multer.File,
+    categoryUpdate: Category,
   ): Promise<Product> {
+    const currentProduct = await this.findById(id);
     if (images) {
-      const currentProduct = await this.findById(id);
       const currentImageURL = currentProduct.images;
       if (currentImageURL) {
         const fileName = this.fileStoragesService.getFileName(currentImageURL);
@@ -48,9 +51,25 @@ export class ProductsService {
         images,
       );
     }
-    return this.productModel
+
+    const oldCategory = await this.categoriesService.findOne(
+      currentProduct.category.toString(),
+    );
+
+    oldCategory.products = oldCategory.products.filter(
+      (product) => product.id !== id,
+    );
+
+    const productUpdated = await this.productModel
       .findOneAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
       .exec();
+
+    categoryUpdate.products.push(productUpdated);
+
+    oldCategory.save();
+    categoryUpdate.save();
+
+    return productUpdated;
   }
   async findAll(
     paginationQueryDto: PaginationQueryDto,

@@ -134,6 +134,7 @@ export class ProductsController {
         status: 400,
       });
     }
+
     const category = await this.categoriesService.findOne(
       updateProductDto.category,
     );
@@ -153,7 +154,12 @@ export class ProductsController {
       });
     }
     try {
-      return this.productsService.update(id, updateProductDto, images);
+      return this.productsService.update(
+        id,
+        updateProductDto,
+        images,
+        category,
+      );
     } catch (e) {
       throw new InternalServerErrorException();
     }
