@@ -1,16 +1,16 @@
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
 export class UpdateOrderDto {
   @IsOptional()
-  @ApiHideProperty()
+  @ApiProperty()
   quantity: number;
 
   @IsOptional()
-  @ApiHideProperty()
+  @ApiProperty()
   note: string;
 
   @IsOptional()
   @ApiProperty()
-  status: string;
+  status: number;
 }

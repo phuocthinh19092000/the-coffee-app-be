@@ -226,4 +226,39 @@ export class OrdersController {
 
     return updatedOrder;
   }
+
+  @Patch('/me/:id')
+  @ApiOperation({
+    summary: 'Update order',
+  })
+  @ApiOkResponse({
+    description: 'Update Order successfully',
+    type: UpdateOrderDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid status' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID of Order',
+    type: String,
+  })
+  @UseGuards(JwtAuthGuard)
+  @Roles(RoleType.CUSTOMER, RoleType.ADMIN)
+  async updateOrder(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
+    const order = await this.orderService.findById(id);
+
+    if (!order) {
+      throw new BadRequestException({ description: 'Order not exist' });
+    }
+
+    const updateOrder = await this.orderService.updateOrder(
+      order,
+      updateOrderDto,
+    );
+
+    return updateOrder;
+  }
 }
