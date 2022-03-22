@@ -5,6 +5,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  Logger,
   Param,
   Patch,
   Post,
@@ -30,9 +31,7 @@ import { NotificationsService } from 'src/modules/notification/services/notifica
 import { ProductsService } from 'src/modules/products/services/products.service';
 import {
   MessageNewOrder,
-  MessageUpdateOrder,
   OrderStatus,
-  OrderStatusNumber,
   TitleOrder,
 } from '../constants/order.constant';
 import { PaginationQueryDto } from 'src/modules/shared/dto/pagination-query.dto';
@@ -42,14 +41,10 @@ import { UpdateStatusOrderDto } from '../dto/requests/update-status-order.dto';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
 import { StatusService } from 'src/modules/status/services/status.service';
-import { PushNotificationGoogleChatDto } from 'src/modules/notification/dto/requests/push-notification-google-chat.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RoleType } from 'src/modules/roles/constants/role.constant';
 import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gateway';
-import {
-  HANDLE_ORDER_EVENT,
-  ORDER_CANCELED,
-} from 'src/modules/events/constants/event.constant';
+import { HANDLE_ORDER_EVENT } from 'src/modules/events/constants/event.constant';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { ProductStatus } from 'src/modules/products/constants/product.constant';
 
@@ -198,14 +193,13 @@ export class OrdersController {
     @Body() updateStatusOrderDto: UpdateStatusOrderDto,
   ): Promise<Order> {
     const order = await this.orderService.findById(id);
+
     if (!order) {
       throw new BadRequestException({ description: 'Order not exist' });
     }
 
     const user = await this.usersService.findUserById(order.user.toString());
 
-    const valueCurrentStatus = order.orderStatus.value;
-    const nameCurrentStatus = order.orderStatus.name;
     const newStatus = await this.statusService.findByValue(
       updateStatusOrderDto.status,
     );
@@ -213,89 +207,23 @@ export class OrdersController {
       throw new BadRequestException({ description: 'Invalid status' });
     }
 
-    const valueNewStatus = newStatus.value;
-    const nameNewStatus = newStatus.name;
-    const checkCorrectStatus =
-      valueNewStatus === valueCurrentStatus + 1 ||
-      ((valueCurrentStatus === OrderStatusNumber.NEW ||
-        valueCurrentStatus === OrderStatusNumber.PROCESSING) &&
-        valueNewStatus === OrderStatusNumber.CANCELED);
+    const updatedOrder = await this.orderService.updateStatus(
+      order,
+      updateStatusOrderDto,
+      newStatus,
+      user,
+    );
 
-    if (checkCorrectStatus) {
-      if (
-        valueNewStatus === OrderStatusNumber.CANCELED &&
-        !updateStatusOrderDto.reason
-      ) {
-        throw new BadRequestException({
-          description: 'Please fill the reason',
-          status: 400,
-        });
-      }
-      const updatedOrder = await this.orderService.updateStatus(
+    try {
+      this.notificationsService.sendNotificationUpdateStatusOrder(
         order,
-        valueNewStatus,
-        updateStatusOrderDto.reason,
+        newStatus,
+        user,
       );
-
-      if (
-        user.deviceToken.length > 0 &&
-        valueNewStatus === OrderStatusNumber.READY
-      ) {
-        const notification: PushNotificationDto = {
-          deviceToken: user.deviceToken,
-          title: TitleOrder,
-          message: `${MessageUpdateOrder} ${nameNewStatus}`,
-        };
-        const orderData = {
-          quantity: order.quantity.toString(),
-          price: order.product.price.toString(),
-          title: order.product.name,
-          image: order.product.images,
-          status: nameNewStatus,
-        };
-
-        await this.notificationsService.sendNotificationFirebase(
-          notification,
-          orderData,
-        );
-      }
-
-      if (user.webHook && valueNewStatus === OrderStatusNumber.READY) {
-        const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
-          webHook: user.webHook,
-          message: `${MessageUpdateOrder} ${nameNewStatus}`,
-        };
-        await this.notificationsService.sendNotificationToGoogleChat(
-          pushNotificationGoogleChatDto,
-        );
-      }
-
-      await this.eventGateway.sendToStaff(
-        {
-          order: updatedOrder,
-          newOrderStatus: nameNewStatus,
-          currentOrderStatus: nameCurrentStatus,
-        },
-        HANDLE_ORDER_EVENT,
-      );
-
-      if (valueNewStatus === OrderStatusNumber.CANCELED) {
-        await this.eventGateway.sendToCustomer(
-          updatedOrder,
-          user._id,
-          ORDER_CANCELED,
-        );
-
-        const oldFreeUnit = user.freeUnit + order.quantity;
-
-        await this.usersService.updateFreeUnit(user._id, {
-          freeUnit: oldFreeUnit,
-        });
-      }
-
-      return updatedOrder;
-    } else {
-      throw new BadRequestException({ description: 'Invalid order status' });
+    } catch (err) {
+      Logger.error(err);
     }
+
+    return updatedOrder;
   }
 }
