@@ -13,11 +13,16 @@ import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import {
   MessageRemindPickUpOrder,
+  MessageUpdateOrder,
   OrderStatus,
+  OrderStatusNumber,
   TitleOrder,
 } from 'src/modules/orders/constants/order.constant';
 import { OrdersService } from 'src/modules/orders/services/orders.service';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { Order } from 'src/modules/orders/entities/order.entity';
+import { Status } from 'src/modules/status/entities/status.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 @Injectable()
 export class NotificationsService {
   constructor(
@@ -99,6 +104,7 @@ export class NotificationsService {
 
     return admin.messaging().sendToDevice(deviceToken, payload);
   }
+
   async sendNotificationToGoogleChat(
     pushNotificationGoogleChatDto: PushNotificationGoogleChatDto,
   ): Promise<AxiosResponse> {
@@ -112,5 +118,40 @@ export class NotificationsService {
     );
 
     return lastValueFrom(observableResponse);
+  }
+
+  async sendNotificationUpdateStatusOrder(
+    order: Order,
+    newStatus: Status,
+    user: User,
+  ) {
+    const { name: nameNewStatus, value: valueNewStatus } = newStatus;
+
+    if (
+      user.deviceToken.length > 0 &&
+      valueNewStatus === OrderStatusNumber.READY
+    ) {
+      const notification: PushNotificationDto = {
+        deviceToken: user.deviceToken,
+        title: TitleOrder,
+        message: `${MessageUpdateOrder} ${nameNewStatus}`,
+      };
+      const orderData = {
+        quantity: order.quantity.toString(),
+        price: order.product.price.toString(),
+        title: order.product.name,
+        image: order.product.images,
+        status: nameNewStatus,
+      };
+      await this.sendNotificationFirebase(notification, orderData);
+    }
+
+    if (user.webHook && valueNewStatus === OrderStatusNumber.READY) {
+      const pushNotificationGoogleChatDto: PushNotificationGoogleChatDto = {
+        webHook: user.webHook,
+        message: `${MessageUpdateOrder} ${nameNewStatus}`,
+      };
+      await this.sendNotificationToGoogleChat(pushNotificationGoogleChatDto);
+    }
   }
 }
