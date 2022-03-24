@@ -19,6 +19,7 @@ import {
   ORDER_CANCELED,
 } from 'src/modules/events/constants/event.constant';
 import { OrderEventGateway } from 'src/modules/events/gateways/order-event.gateway';
+import { UpdateOrderDto } from '../dto/requests/update-order.dto';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -111,6 +112,7 @@ export class OrdersService {
   ) {
     const valueNewStatus = newStatus.value;
     const valueCurrentStatus = order.orderStatus.value;
+    const nameCurrentStatus = order.orderStatus.name;
     const isCorrectStatus =
       valueNewStatus === valueCurrentStatus + 1 ||
       ((valueCurrentStatus === OrderStatusNumber.NEW ||
@@ -143,7 +145,7 @@ export class OrdersService {
       {
         order,
         newOrderStatus: newStatus.name,
-        currentOrderStatus: order.orderStatus.name,
+        currentOrderStatus: nameCurrentStatus,
       },
       HANDLE_ORDER_EVENT,
     );
@@ -151,11 +153,56 @@ export class OrdersService {
     if (valueNewStatus === OrderStatusNumber.CANCELED) {
       this.eventGateway.sendToCustomer(order, user._id, ORDER_CANCELED);
       const oldFreeUnit = user.freeUnit + order.quantity;
-      await this.usersService.updateFreeUnit(user._id, {
+      this.usersService.updateFreeUnit(user._id, {
         freeUnit: oldFreeUnit,
       });
     }
 
     return order;
+  }
+
+  async updateOrder(order: Order, updateOrderDto: UpdateOrderDto) {
+    const user = await this.usersService.findUserById(order.user.toString());
+    const valueNewStatus = updateOrderDto.status;
+    const newStatus = await this.statusService.findByValue(valueNewStatus);
+    const valueCurrentStatus = order.orderStatus.value;
+    const isCorrectStatus =
+      valueCurrentStatus === OrderStatusNumber.NEW &&
+      (!valueNewStatus || valueNewStatus === OrderStatusNumber.CANCELED);
+
+    if (!isCorrectStatus) {
+      throw new BadRequestException({ description: 'Invalid order status' });
+    }
+
+    if (valueNewStatus) {
+      order.orderStatus = newStatus._id;
+      order.save();
+      const newFreeUnit = user.freeUnit + order.quantity;
+      this.usersService.updateFreeUnit(user._id, {
+        freeUnit: newFreeUnit,
+      });
+    } else {
+      const currentOrderQuantity = order.quantity;
+      order = await this.orderModel.findOneAndUpdate(
+        { _id: order.id },
+        { $set: updateOrderDto },
+        { new: true },
+      );
+      const newFreeUnit = updateOrderDto.quantity
+        ? user.freeUnit + currentOrderQuantity - updateOrderDto.quantity
+        : user.freeUnit;
+      this.usersService.updateFreeUnit(user._id, {
+        freeUnit: newFreeUnit,
+      });
+    }
+
+    this.eventGateway.sendToStaff(
+      {
+        order,
+      },
+      HANDLE_ORDER_EVENT,
+    );
+
+    return order.populate([{ path: 'orderStatus', select: ['value', 'name'] }]);
   }
 }
