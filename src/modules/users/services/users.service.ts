@@ -6,6 +6,7 @@ import { UpdateUserDto } from '../dto/requests/update-user.dto';
 import { User } from '../entities/user.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { AppConfigService } from 'src/common/config/config.service';
+import { UpdateFreeUnitDto } from '../dto/requests/update-freeunit-dto';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,19 @@ export class UsersService {
     return user.save();
   }
 
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    roleId: string,
+  ): Promise<User> {
+    updateUserDto.role = roleId;
+    return this.userModel.findOneAndUpdate(
+      { _id: id },
+      { $set: updateUserDto },
+      { new: true },
+    );
+  }
+
   findUserByEmail(email: string): Promise<User | undefined> {
     return this.userModel.findOne({ email }).exec();
   }
@@ -41,8 +55,8 @@ export class UsersService {
     );
   }
 
-  async updateAllFreeUnit(updateUserDto: UpdateUserDto) {
-    return this.userModel.updateMany(updateUserDto);
+  async updateAllFreeUnit(updateFreeUnitDto: UpdateFreeUnitDto) {
+    return this.userModel.updateMany(updateFreeUnitDto);
   }
 
   async addDeviceToken(user: User, deviceToken: string) {
