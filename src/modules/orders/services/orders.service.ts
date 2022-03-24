@@ -195,14 +195,15 @@ export class OrdersService {
         freeUnit: newFreeUnit,
       });
     }
-
+    await order.populate([{ path: 'orderStatus', select: ['value', 'name'] }]);
     this.eventGateway.sendToStaff(
       {
-        order,
+        order: order,
+        newOrderStatus: valueNewStatus && newStatus.name,
       },
       HANDLE_ORDER_EVENT,
     );
 
-    return order.populate([{ path: 'orderStatus', select: ['value', 'name'] }]);
+    return order;
   }
 }
