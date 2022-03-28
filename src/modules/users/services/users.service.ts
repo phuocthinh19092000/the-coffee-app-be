@@ -7,6 +7,7 @@ import { User } from '../entities/user.entity';
 import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { AppConfigService } from 'src/common/config/config.service';
 import { UpdateFreeUnitDto } from '../dto/requests/update-freeunit-dto';
+import { UserStatus } from '../constants/user.constant';
 
 @Injectable()
 export class UsersService {
@@ -37,6 +38,14 @@ export class UsersService {
       { $set: updateUserDto },
       { new: true },
     );
+  }
+
+  async checkUserActive(email: string): Promise<User> {
+    const user = await this.findUserByEmail(email);
+    if (user && user.available === UserStatus.ACTIVE) {
+      return user;
+    }
+    return null;
   }
 
   findUserByEmail(email: string): Promise<User | undefined> {

@@ -38,7 +38,7 @@ export class CreateUserDto {
   @IsEnum(UserStatus)
   @IsOptional()
   @ApiProperty({ enum: UserStatus })
-  avaialble: string;
+  available: string;
 
   @IsNumber()
   @ApiProperty()
