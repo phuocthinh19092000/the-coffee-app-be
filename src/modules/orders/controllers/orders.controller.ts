@@ -160,7 +160,8 @@ export class OrdersController {
 
       await this.eventGateway.sendToStaff(
         {
-          order,
+          order: order,
+          newOrderStatus: 'new',
         },
         HANDLE_ORDER_EVENT,
       );
