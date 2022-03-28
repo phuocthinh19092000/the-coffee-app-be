@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AppConfigService } from 'src/common/config/config.service';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { UserStatus } from 'src/modules/users/constants/user.constant';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -19,6 +20,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: payload) {
-    return await this.userService.findUserById(payload.id);
+    const user = await this.userService.findUserById(payload.id);
+    if (user && user.available === UserStatus.ACTIVE) {
+      return user;
+    }
+    return null;
   }
 }
