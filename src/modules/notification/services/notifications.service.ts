@@ -78,6 +78,7 @@ export class NotificationsService {
         price: product.price.toString(),
         title: product.name,
         status: OrderStatus.READY,
+        image: product.images,
       };
       await this.sendNotificationFirebase(
         pushNotificationByFirebase,
