@@ -195,7 +195,10 @@ export class OrdersService {
         freeUnit: newFreeUnit,
       });
     }
-    await order.populate([{ path: 'orderStatus', select: ['value', 'name'] }]);
+    await order.populate([
+      { path: 'orderStatus', select: ['value', 'name'] },
+      { path: 'user', select: ['name', 'phoneNumber'] },
+    ]);
     this.eventGateway.sendToStaff(
       {
         order: order,
