@@ -199,7 +199,6 @@ export class OrdersService {
     this.eventGateway.sendToStaff(
       {
         order: order,
-        newOrderStatus: valueNewStatus && newStatus.name,
       },
       HANDLE_ORDER_EVENT,
     );
