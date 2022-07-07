@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from '../dto/requests/create-user.dto';
@@ -8,12 +8,14 @@ import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { AppConfigService } from 'src/common/config/config.service';
 import { UpdateFreeUnitDto } from '../dto/requests/update-freeunit-dto';
 import { UserStatus } from '../constants/user.constant';
+import { FileStoragesService } from 'src/modules/file-storage/services/file-storage.sevice';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly appConfigService: AppConfigService,
+    private readonly fileStoragesService: FileStoragesService,
   ) {}
 
   async createUser(
@@ -27,12 +29,7 @@ export class UsersService {
     return user.save();
   }
 
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-    roleId: string,
-  ): Promise<User> {
-    updateUserDto.role = roleId;
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     return this.userModel.findOneAndUpdate(
       { _id: id },
       { $set: updateUserDto },
@@ -92,6 +89,30 @@ export class UsersService {
   async changePassword(user: User, newPassword: string) {
     user.password = newPassword;
     return user.save();
+  }
+
+  async updateAvatar(
+    id: string,
+    // updateAvatar: UpdateUserDto,
+    avatarUrl: Express.Multer.File,
+  ): Promise<string> {
+    const user = await this.findUserById(id);
+    if (!user) {
+      throw new BadRequestException({
+        description: 'User does not exist',
+        status: 400,
+      });
+    }
+    if (avatarUrl) {
+      const currentAvatarURL = user.avatarUrl;
+      if (currentAvatarURL) {
+        const fileName = this.fileStoragesService.getFileName(currentAvatarURL);
+        this.fileStoragesService.deleteFile(fileName);
+      }
+      user.avatarUrl = await this.fileStoragesService.storeFile(avatarUrl);
+    }
+    user.save();
+    return user.avatarUrl;
   }
 
   async findAllUser(

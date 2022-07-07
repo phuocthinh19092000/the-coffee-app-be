@@ -56,18 +56,18 @@ export class ProductsService {
       currentProduct.category.toString(),
     );
 
-    oldCategory.products = oldCategory.products.filter(
-      (product) => product.id !== id,
-    );
-
     const productUpdated = await this.productModel
       .findOneAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
       .exec();
 
-    categoryUpdate.products.push(productUpdated);
-
-    oldCategory.save();
-    categoryUpdate.save();
+    if (productUpdated.category.id !== categoryUpdate.id) {
+      oldCategory.products = oldCategory.products.filter(
+        (product) => product.id !== id,
+      );
+      categoryUpdate.products.push(productUpdated);
+      oldCategory.save();
+      categoryUpdate.save();
+    }
 
     return productUpdated;
   }

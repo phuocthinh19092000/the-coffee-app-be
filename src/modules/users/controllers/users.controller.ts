@@ -3,11 +3,14 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Patch,
   Post,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -30,6 +33,8 @@ import { PaginationQueryDto } from '../../shared/dto/pagination-query.dto';
 import { ChangePasswordDto } from '../dto/requests/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { AddDeviceTokenDto } from '../dto/requests/add-device-token.dto';
+import { UpdateUserDto } from '../dto/requests/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('users')
@@ -141,6 +146,27 @@ export class UsersController {
   @Get('/webhook')
   getWebhook(@User() user) {
     return user.webHook;
+  }
+
+  @ApiOperation({ summary: 'Update avatar ' })
+  @ApiOkResponse({
+    description: 'Update avatar successfully',
+    type: UserInforDto,
+  })
+  @UseInterceptors(FileInterceptor('avatarUrl'))
+  @ApiUnauthorizedResponse({ description: 'Please Authenticate' })
+  @Patch('/avatar')
+  updateAvatar(
+    @User() user,
+    // @Body()
+    // updateAvatar: UpdateUserDto,
+    @UploadedFile() avatarUrl: Express.Multer.File,
+  ) {
+    try {
+      return this.usersService.updateAvatar(user.id, avatarUrl);
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
   @ApiOperation({ summary: 'Add device token for user' })

@@ -69,7 +69,7 @@ export class OrdersService {
       .find({ orderStatus: status, createdAt: { $gte: startDay, $lt: endDay } })
       .populate({ path: 'orderStatus', select: ['name', 'value'] })
       .populate({ path: 'product', select: ['images', 'name', 'price'] })
-      .populate({ path: 'user', select: ['name', 'phoneNumber'] });
+      .populate({ path: 'user', select: ['name', 'phoneNumber', 'avatarUrl'] });
     if (status && statusName === OrderStatus.NEW) {
       return orders.sort({ updateAt: 'asc' });
     } else if (status && statusName !== OrderStatus.NEW) {
@@ -100,7 +100,7 @@ export class OrdersService {
     return newOrder.populate([
       { path: 'product', select: ['images', 'price', 'name'] },
       { path: 'orderStatus', select: ['value', 'name'] },
-      { path: 'user', select: ['name', 'phoneNumber'] },
+      { path: 'user', select: ['name', 'phoneNumber', 'avatarUrl'] },
     ]);
   }
 
@@ -207,5 +207,23 @@ export class OrdersService {
     );
 
     return order;
+  }
+
+  getListOrderByDateRange(param, paginationQueryDto?: PaginationQueryDto) {
+    const { limit, offset } = paginationQueryDto;
+    const endAt: Date = new Date(param.from);
+    const startAt: Date = new Date(param.to);
+    const listOrder = this.orderModel
+      .find({
+        createdAt: { $gte: startAt, $lt: endAt },
+      })
+      .skip(offset)
+      .limit(limit)
+      .sort({ createdAt: 'asc' });
+    return listOrder.populate([
+      { path: 'user', select: ['name'] },
+      { path: 'orderStatus', select: ['name', 'value'] },
+      { path: 'product', select: ['name'] },
+    ]);
   }
 }

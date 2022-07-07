@@ -24,12 +24,14 @@ import { CreateUserDto } from 'src/modules/users/dto/requests/create-user.dto';
 import { UpdateUserDto } from 'src/modules/users/dto/requests/update-user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { UsersService } from 'src/modules/users/services/users.service';
+import { AdminService } from '../services/admin.service';
 @Roles(RoleType.ADMIN)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('admin/account')
 @Controller('admin/account')
 export class AdminController {
   constructor(
+    private readonly adminService: AdminService,
     private readonly userService: UsersService,
     private readonly rolesService: RolesService,
   ) {}
@@ -57,6 +59,8 @@ export class AdminController {
     return this.userService.createUser(createUserDto, role._id);
   }
 
+  @Roles(RoleType.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Update account' })
   @ApiOkResponse({
     description: 'update account successfully',
@@ -94,7 +98,7 @@ export class AdminController {
     }
 
     try {
-      return this.userService.updateUser(id, updateUserDto, role._id);
+      return this.adminService.updateUser(id, updateUserDto, role._id);
     } catch (e) {
       Logger.error(e);
     }

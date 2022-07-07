@@ -62,6 +62,27 @@ export class OrdersController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Get('/date-range')
+  @ApiOperation({
+    description: 'Get orders by Date Range - Sort by date',
+    summary: 'Get orders by Date Range - Sort by date',
+  })
+  @ApiOkResponse({
+    description: 'Get orders by Date Range successfully',
+    type: [Order],
+  })
+  findByDate(
+    @Query('date') param,
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ) {
+    // eslint-disable-next-line no-console
+    console.log(param);
+    return this.orderService.getListOrderByDateRange(
+      JSON.parse(param),
+      paginationQueryDto,
+    );
+  }
+
   @Get('/user')
   @ApiOperation({
     description: 'Get orders by userId - Sort by date',
@@ -81,7 +102,7 @@ export class OrdersController {
   @Get()
   @Roles(RoleType.VENDOR)
   @UseGuards(RolesGuard)
-  @ApiBearerAuth()
+  // @ApiBearerAuth()
   @ApiOperation({
     description: 'Get orders by status',
     summary: 'Get orders by status',

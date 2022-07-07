@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
 //TODO: Wait Final FE DEPLOY
-// export const REACT_END_POINT = process.env.REACT_END_POINT;
+export const REACT_END_POINT = process.env.REACT_END_POINT;
 
-export const REACT_END_POINT = 'https://otsv-the-coffee-app.netlify.app';
+// export const REACT_END_POINT = 'https://otsv-the-coffee-app.netlify.app';
 export const HANDLE_ORDER_EVENT = 'handleOrder';
 export const ORDER_CANCELED = 'orderCanceled';
 
